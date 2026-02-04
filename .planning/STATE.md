@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Developers can quickly understand how the app works and confidently make changes without breaking existing functionality.
-**Current focus:** Phase 3 - Architecture Overview
+**Current focus:** Phase 4 - Database Reference
 
 ## Current Position
 
-Phase: 3 of 10 (Architecture Overview)
+Phase: 4 of 10 (Database Reference)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-02-05 - Completed 03-01-PLAN.md (Architecture Overview)
+Last activity: 2026-02-05 - Completed 04-01-PLAN.md (Database Reference Documentation)
 
-Progress: [###.......] 30%
+Progress: [####......] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 2 min
-- Total execution time: 6 min
+- Total execution time: 8 min
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [###.......] 30%
 | 01-documentation-hub | 1 | 2 min | 2 min |
 | 02-setup-guide | 1 | 2 min | 2 min |
 | 03-architecture-overview | 1 | 2 min | 2 min |
+| 04-database-reference | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 02-01 (2 min), 03-01 (2 min)
+- Last 5 plans: 01-01 (2 min), 02-01 (2 min), 03-01 (2 min), 04-01 (2 min)
 - Trend: Consistent pace
 
 *Updated after each plan completion*
@@ -55,6 +56,9 @@ Recent decisions affecting current work:
 - [03-01]: Used Mermaid diagrams for visual architecture representation (GitHub-native rendering)
 - [03-01]: Organized architecture by layers matching actual codebase structure
 - [03-01]: Included threading model as critical for Android development
+- [04-01]: Documented RecurrenceType millisecond values explicitly for timing calculations
+- [04-01]: Included 3 practical query examples (active reminders, time range, aggregation)
+- [04-01]: Added best practices for threading, testing, migrations, and indexes
 
 ### Pending Todos
 
@@ -67,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 03-01-PLAN.md (Architecture Overview)
+Stopped at: Completed 04-01-PLAN.md (Database Reference Documentation)
 Resume file: None
