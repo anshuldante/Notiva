@@ -79,10 +79,10 @@ Plans:
   3. Room DAO methods are documented with query explanations
   4. Mermaid ER diagram shows entity relationships
   5. Developer can write a new Room query after reading
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 04-01: Create database documentation
+- [ ] 04-01-PLAN.md — Create database reference with schema, ER diagram, DAO documentation, and query examples
 
 ### Phase 5: Testing Guide
 **Goal**: Developers can run existing tests and write new ones
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Documentation Hub | 1/1 | Complete ✓ | 2026-02-04 |
 | 2. Setup Guide | 1/1 | Complete ✓ | 2026-02-04 |
 | 3. Architecture Overview | 1/1 | Complete ✓ | 2026-02-05 |
-| 4. Database Reference | 0/1 | Not started | - |
+| 4. Database Reference | 0/1 | Planned | - |
 | 5. Testing Guide | 0/1 | Not started | - |
 | 6. Reminders Feature | 0/1 | Not started | - |
 | 7. Notifications Feature | 0/1 | Not started | - |
@@ -194,4 +194,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 3 completion*
+*Last updated: 2026-02-05 after Phase 4 planning*
