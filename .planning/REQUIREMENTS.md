@@ -62,26 +62,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | - | Pending |
-| FOUND-02 | - | Pending |
-| FOUND-03 | - | Pending |
-| FOUND-04 | - | Pending |
-| REF-01 | - | Pending |
-| REF-02 | - | Pending |
-| REF-03 | - | Pending |
-| FEAT-01 | - | Pending |
-| FEAT-02 | - | Pending |
-| FEAT-03 | - | Pending |
-| FEAT-04 | - | Pending |
-| FEAT-05 | - | Pending |
-| UI-01 | - | Pending |
-| UI-02 | - | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 2 | Pending |
+| FOUND-03 | Phase 3 | Pending |
+| FOUND-04 | Phase 10 | Pending |
+| REF-01 | Phase 4 | Pending |
+| REF-02 | Phase 4 | Pending |
+| REF-03 | Phase 5 | Pending |
+| FEAT-01 | Phase 6 | Pending |
+| FEAT-02 | Phase 7 | Pending |
+| FEAT-03 | Phase 8 | Pending |
+| FEAT-04 | Phase 8 | Pending |
+| FEAT-05 | Phase 10 | Pending |
+| UI-01 | Phase 9 | Pending |
+| UI-02 | Phase 9 | Pending |
 
 **Coverage:**
 - v1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after initial definition*
+*Last updated: 2026-02-04 after roadmap creation*
