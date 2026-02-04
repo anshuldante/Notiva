@@ -49,10 +49,10 @@ Plans:
   3. Clone, build, and run steps work on a fresh machine
   4. Common setup errors and resolutions are documented
   5. Developer can go from clone to running app in under 15 minutes
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 02-01: Create setup guide
+- [ ] 02-01-PLAN.md — Create comprehensive setup guide with prerequisites, build steps, and troubleshooting
 
 ### Phase 3: Architecture Overview
 **Goal**: Developers understand the app's structure, layers, and component relationships
@@ -182,7 +182,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Documentation Hub | 1/1 | Complete ✓ | 2026-02-04 |
-| 2. Setup Guide | 0/1 | Not started | - |
+| 2. Setup Guide | 0/1 | Planned | - |
 | 3. Architecture Overview | 0/1 | Not started | - |
 | 4. Database Reference | 0/1 | Not started | - |
 | 5. Testing Guide | 0/1 | Not started | - |
