@@ -64,10 +64,10 @@ Plans:
   3. Key patterns documented (MVVM, Hilt DI, Room, WorkManager)
   4. Component responsibilities are clear (what each layer does)
   5. Developer can draw the architecture on a whiteboard after reading
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 03-01: Create architecture overview
+- [ ] 03-01-PLAN.md — Create architecture overview with layer diagram, data flow diagram, and pattern documentation
 
 ### Phase 4: Database Reference
 **Goal**: Developers understand the data model and can work with Room entities
@@ -183,7 +183,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 |-------|----------------|--------|-----------|
 | 1. Documentation Hub | 1/1 | Complete ✓ | 2026-02-04 |
 | 2. Setup Guide | 1/1 | Complete ✓ | 2026-02-04 |
-| 3. Architecture Overview | 0/1 | Not started | - |
+| 3. Architecture Overview | 0/1 | Planned | - |
 | 4. Database Reference | 0/1 | Not started | - |
 | 5. Testing Guide | 0/1 | Not started | - |
 | 6. Reminders Feature | 0/1 | Not started | - |
@@ -194,4 +194,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-04*
+*Last updated: 2026-02-05*
