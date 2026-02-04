@@ -2,6 +2,7 @@
 
 ## TODO (high priority)
 
+- Fix bugs with dimming.
 - Add logic to show multiple different notifications instead of overwriting the previous one.
   - Or group them instead.
 - Add function to show missed reminders. 
@@ -24,24 +25,13 @@
 
 ## App Modernization Suggestions
 
-[x] Refactor code for MVVM or recommended architecture.
-[] Use ViewBinding or Jetpack Compose for UI.
-[] Update Gradle dependencies to latest stable versions.
-[] Add runtime permissions handling if targeting Android 6.0+.
-[] Use androidx libraries everywhere.
 [] Optimize layouts for accessibility and responsiveness.
 [] Add unit and UI tests.
-[] Implement dark mode support.
 [] Use Navigation Component for in-app navigation.
-[] Leverage WorkManager for background tasks.
 [] Integrate Firebase or other analytics tools.
 [] Use Glide or Picasso for image loading.
-[] Implement data persistence with Room or other databases.
 [] Optimize app performance and memory usage.
-[] Follow Material Design guidelines for UI/UX.
-[] Use ConstraintLayout for complex layouts.
 [] Implement localization for multiple languages.
-[] Use Lint and static analysis tools to improve code quality.
 [] Regularly update the app to fix bugs and add new features.
 [] Monitor app performance with tools like Firebase Performance Monitoring.
 [] Use Coroutines or RxJava for asynchronous programming.
