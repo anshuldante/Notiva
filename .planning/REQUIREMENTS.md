@@ -10,7 +10,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Foundation
 
 - [x] **FOUND-01**: README.md with project overview, badges, and quick start link ✓
-- [ ] **FOUND-02**: Setup instructions covering prerequisites, clone, build, and first run
+- [x] **FOUND-02**: Setup instructions covering prerequisites, clone, build, and first run ✓
 - [ ] **FOUND-03**: Architecture overview with Mermaid component diagram showing layers and patterns
 - [ ] **FOUND-04**: CONTRIBUTING.md with PR process, code style guide, and commit conventions
 
@@ -63,7 +63,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 2 | Pending |
+| FOUND-02 | Phase 2 | Complete |
 | FOUND-03 | Phase 3 | Pending |
 | FOUND-04 | Phase 10 | Pending |
 | REF-01 | Phase 4 | Pending |
