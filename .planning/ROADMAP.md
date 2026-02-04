@@ -34,10 +34,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. README contains "I want to..." navigation table linking to all planned docs
   3. README displays badges for build status and license
   4. Developer landing on docs/ immediately knows what docs exist and where to find them
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 01-01: Create documentation hub
+- [ ] 01-01-PLAN.md — Create documentation hub with overview, badges, and navigation table
 
 ### Phase 2: Setup Guide
 **Goal**: New developers can set up their environment and run the app successfully
@@ -181,7 +181,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Documentation Hub | 0/1 | Not started | - |
+| 1. Documentation Hub | 0/1 | Planned | - |
 | 2. Setup Guide | 0/1 | Not started | - |
 | 3. Architecture Overview | 0/1 | Not started | - |
 | 4. Database Reference | 0/1 | Not started | - |
