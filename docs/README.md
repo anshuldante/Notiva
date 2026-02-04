@@ -48,8 +48,8 @@ cd my-reminder-app
 | Document | Status | Description |
 |----------|--------|-------------|
 | [README.md](README.md) | Available | This file - documentation hub |
-| [SETUP.md](SETUP.md) | Planned | Development environment setup |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Planned | App architecture and patterns |
+| [SETUP.md](SETUP.md) | Available | Development environment setup |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Available | App architecture and patterns |
 | [DATABASE.md](DATABASE.md) | Planned | Room schema and migrations |
 | [TESTING.md](TESTING.md) | Planned | Testing strategy and guides |
 | [UI.md](UI.md) | Planned | UI components and navigation |
@@ -106,4 +106,4 @@ my-reminder-app/
 
 ---
 
-*Documentation last updated: 2026-02-04*
+*Documentation last updated: 2026-02-05*
