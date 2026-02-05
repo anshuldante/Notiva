@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Developers can quickly understand how the app works and confidently make changes without breaking existing functionality.
-**Current focus:** Phase 8 - Recurrence and Constraints
+**Current focus:** Phase 9 - UI Documentation
 
 ## Current Position
 
-Phase: 8 of 10 (Recurrence and Constraints)
+Phase: 9 of 10 (UI Documentation)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-02-05 - Completed 08-01-PLAN.md (Recurrence and Constraints Documentation)
+Last activity: 2026-02-05 - Completed 09-01-PLAN.md (UI Documentation)
 
-Progress: [########..] 80%
+Progress: [#########.] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 2 min
-- Total execution time: 19 min
+- Total execution time: 21 min
 
 **By Phase:**
 
@@ -35,9 +35,10 @@ Progress: [########..] 80%
 | 06-reminders-feature | 1 | 3 min | 3 min |
 | 07-notifications-feature | 1 | 3 min | 3 min |
 | 08-recurrence-and-constraints | 1 | 3 min | 3 min |
+| 09-ui-documentation | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2 min), 05-01 (2 min), 06-01 (3 min), 07-01 (3 min), 08-01 (3 min)
+- Last 5 plans: 05-01 (2 min), 06-01 (3 min), 07-01 (3 min), 08-01 (3 min), 09-01 (2 min)
 - Trend: Consistent pace
 
 *Updated after each plan completion*
@@ -74,6 +75,10 @@ Recent decisions affecting current work:
 - [08-01]: Documented MONTH (31-day) and YEAR (366-day) approximations explicitly
 - [08-01]: Explained WorkManager + AlarmManager hybrid architecture with clear rationale
 - [08-01]: Covered 5 Android constraints: Doze, battery, exact alarms, boot, foreground service
+- [09-01]: Organized by screen (MainActivity, UpsertReminderActivity) with component deep-dives
+- [09-01]: Included Mermaid flowchart showing all navigation paths including permission handling
+- [09-01]: Documented Intent extras from ReminderConstants for inter-activity communication
+- [09-01]: Added guide for adding new screens with checklist of conventions
 
 ### Pending Todos
 
@@ -86,5 +91,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 08-01-PLAN.md (Recurrence and Constraints Documentation)
+Stopped at: Completed 09-01-PLAN.md (UI Documentation)
 Resume file: None
