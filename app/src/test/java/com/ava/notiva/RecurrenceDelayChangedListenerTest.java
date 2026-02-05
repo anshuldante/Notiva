@@ -16,9 +16,6 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for {@link RecurrenceDelayChangedListener}.
  * Tests that recurrence delay text changes update the model and trigger summary updates.
- *
- * NOTE: This listener has a known bug - it throws NumberFormatException on empty input.
- * See bugs_found.md #3.
  */
 public class RecurrenceDelayChangedListenerTest {
 
@@ -85,26 +82,40 @@ public class RecurrenceDelayChangedListenerTest {
         assertEquals(0, reminder.getRecurrenceDelay());
     }
 
-    @Test(expected = NumberFormatException.class)
-    public void afterTextChanged_emptyString_throwsNumberFormatException() {
-        // This documents the bug - empty string causes crash
+    @Test
+    public void afterTextChanged_emptyString_keepsPreviousValue() {
+        // FIXED: Empty string no longer crashes, keeps previous value
+        reminder.setRecurrenceDelay(5);
         when(mockEditable.toString()).thenReturn("");
 
         listener.afterTextChanged(mockEditable);
+
+        assertEquals("Should keep previous value on empty input", 5, reminder.getRecurrenceDelay());
+        verify(mockSummaryUpdater).run(); // Summary updater still called
     }
 
-    @Test(expected = NumberFormatException.class)
-    public void afterTextChanged_nonNumeric_throwsNumberFormatException() {
+    @Test
+    public void afterTextChanged_nonNumeric_keepsPreviousValue() {
+        // FIXED: Invalid input no longer crashes, keeps previous value
+        reminder.setRecurrenceDelay(10);
         when(mockEditable.toString()).thenReturn("abc");
 
         listener.afterTextChanged(mockEditable);
+
+        assertEquals("Should keep previous value on invalid input", 10, reminder.getRecurrenceDelay());
+        verify(mockSummaryUpdater).run();
     }
 
-    @Test(expected = NumberFormatException.class)
-    public void afterTextChanged_whitespace_throwsNumberFormatException() {
+    @Test
+    public void afterTextChanged_whitespace_keepsPreviousValue() {
+        // FIXED: Whitespace no longer crashes, keeps previous value
+        reminder.setRecurrenceDelay(7);
         when(mockEditable.toString()).thenReturn("   ");
 
         listener.afterTextChanged(mockEditable);
+
+        assertEquals("Should keep previous value on whitespace input", 7, reminder.getRecurrenceDelay());
+        verify(mockSummaryUpdater).run();
     }
 
     @Test

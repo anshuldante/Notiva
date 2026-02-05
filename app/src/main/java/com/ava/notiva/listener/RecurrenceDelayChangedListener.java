@@ -26,7 +26,14 @@ public class RecurrenceDelayChangedListener implements TextWatcher {
 
   @Override
   public void afterTextChanged(Editable s) {
-    reminder.setRecurrenceDelay(Integer.parseInt(s.toString()));
+    String text = s.toString().trim();
+    if (!text.isEmpty()) {
+      try {
+        reminder.setRecurrenceDelay(Integer.parseInt(text));
+      } catch (NumberFormatException ignored) {
+        // Invalid input, keep previous value
+      }
+    }
     summaryUpdater.run();
   }
 }
