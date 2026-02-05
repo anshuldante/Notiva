@@ -94,10 +94,10 @@ Plans:
   3. Test directory structure is explained
   4. Example test cases demonstrate patterns used in codebase
   5. Developer can add a new test after reading
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 05-01: Create testing guide
+- [ ] 05-01-PLAN.md — Create testing guide with directory structure, commands, and example patterns
 
 ### Phase 6: Reminders Feature
 **Goal**: Developers understand how reminders work from UI to database
@@ -185,7 +185,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. Setup Guide | 1/1 | Complete ✓ | 2026-02-04 |
 | 3. Architecture Overview | 1/1 | Complete ✓ | 2026-02-05 |
 | 4. Database Reference | 1/1 | Complete ✓ | 2026-02-05 |
-| 5. Testing Guide | 0/1 | Not started | - |
+| 5. Testing Guide | 0/1 | Planned | - |
 | 6. Reminders Feature | 0/1 | Not started | - |
 | 7. Notifications Feature | 0/1 | Not started | - |
 | 8. Recurrence and Constraints | 0/1 | Not started | - |
@@ -194,4 +194,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 4 completion*
+*Last updated: 2026-02-05 after Phase 5 planning*
