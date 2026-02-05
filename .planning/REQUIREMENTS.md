@@ -30,8 +30,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI
 
-- [ ] **UI-01**: Screens overview documenting MainActivity and UpsertReminderActivity
-- [ ] **UI-02**: Navigation flow diagram showing screen transitions using Mermaid
+- [x] **UI-01**: Screens overview documenting MainActivity and UpsertReminderActivity ✓
+- [x] **UI-02**: Navigation flow diagram showing screen transitions using Mermaid ✓
 
 ## v2 Requirements
 
@@ -74,8 +74,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FEAT-03 | Phase 8 | Complete |
 | FEAT-04 | Phase 8 | Complete |
 | FEAT-05 | Phase 10 | Pending |
-| UI-01 | Phase 9 | Pending |
-| UI-02 | Phase 9 | Pending |
+| UI-01 | Phase 9 | Complete |
+| UI-02 | Phase 9 | Complete |
 
 **Coverage:**
 - v1 requirements: 14 total
@@ -84,4 +84,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 8 completion*
+*Last updated: 2026-02-05 after Phase 9 completion*
