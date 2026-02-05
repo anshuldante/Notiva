@@ -114,14 +114,14 @@ public class BugVerificationInstrumentedTest {
     // ==================== Bug #5: Missing RECEIVE_BOOT_COMPLETED Permission ====================
 
     /**
-     * Bug #5: RECEIVE_BOOT_COMPLETED permission is not declared in manifest
+     * Bug #5: FIXED - RECEIVE_BOOT_COMPLETED permission is now declared
      * File: AndroidManifest.xml
      *
-     * Current behavior: Permission missing, boot receiver won't work
-     * Expected behavior: Permission should be declared
+     * Previous behavior: Permission missing, boot receiver wouldn't work
+     * Fixed behavior: Permission is declared, boot receiver works
      */
     @Test
-    public void bug5_bootPermission_notDeclaredInManifest() throws PackageManager.NameNotFoundException {
+    public void bug5_bootPermission_isDeclaredInManifest() throws PackageManager.NameNotFoundException {
         PackageManager pm = context.getPackageManager();
         PackageInfo packageInfo = pm.getPackageInfo(
                 context.getPackageName(),
@@ -139,9 +139,7 @@ public class BugVerificationInstrumentedTest {
             }
         }
 
-        // THIS ASSERTION DOCUMENTS THE BUG
-        // After fix, change assertFalse to assertTrue
-        assertFalse("BUG: RECEIVE_BOOT_COMPLETED permission is missing from manifest",
+        assertTrue("RECEIVE_BOOT_COMPLETED permission should be declared in manifest",
                 hasBootPermission);
     }
 
