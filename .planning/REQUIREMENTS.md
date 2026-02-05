@@ -24,8 +24,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **FEAT-01**: Reminders feature documentation with CRUD operations and data flow ✓
 - [x] **FEAT-02**: Notifications feature documentation with triggers, channels, and permissions ✓
-- [ ] **FEAT-03**: Recurrence logic documentation with types, scheduling, and WorkManager integration
-- [ ] **FEAT-04**: Android-specific constraints documented (doze mode, battery optimization, permissions)
+- [x] **FEAT-03**: Recurrence logic documentation with types, scheduling, and WorkManager integration ✓
+- [x] **FEAT-04**: Android-specific constraints documented (doze mode, battery optimization, permissions) ✓
 - [ ] **FEAT-05**: Code examples referencing actual source files for key patterns
 
 ### UI
@@ -71,8 +71,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REF-03 | Phase 5 | Complete |
 | FEAT-01 | Phase 6 | Complete |
 | FEAT-02 | Phase 7 | Complete |
-| FEAT-03 | Phase 8 | Pending |
-| FEAT-04 | Phase 8 | Pending |
+| FEAT-03 | Phase 8 | Complete |
+| FEAT-04 | Phase 8 | Complete |
 | FEAT-05 | Phase 10 | Pending |
 | UI-01 | Phase 9 | Pending |
 | UI-02 | Phase 9 | Pending |
@@ -84,4 +84,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 7 completion*
+*Last updated: 2026-02-05 after Phase 8 completion*
