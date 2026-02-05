@@ -51,6 +51,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -255,17 +256,31 @@ public class UpsertReminderActivity extends AppCompatActivity {
         .build();
 
     datePicker.addOnPositiveButtonClickListener(selection -> {
+      // MaterialDatePicker returns UTC midnight timestamps, so we must extract
+      // date components in UTC to avoid off-by-one-day errors in negative UTC offsets
+      Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+      utcCalendar.setTimeInMillis(selection);
+
+      // Create a local calendar with the UTC date components for comparison
       Calendar selected = Calendar.getInstance();
-      selected.setTimeInMillis(selection);
+      selected.set(YEAR, utcCalendar.get(YEAR));
+      selected.set(MONTH, utcCalendar.get(MONTH));
+      selected.set(DATE, utcCalendar.get(DATE));
+      selected.set(HOUR_OF_DAY, 0);
+      selected.set(MINUTE, 0);
+      selected.set(SECOND, 0);
+      selected.set(MILLISECOND, 0);
+
       currentTime.setTimeInMillis(System.currentTimeMillis());
       if (isStartDate && selected.before(currentTime)) {
         Toast.makeText(this, "Can't setup alarms for a time in the past!", Toast.LENGTH_LONG).show();
       } else if (!isStartDate && selected.before(reminderModel.getStartDateTime())) {
         Toast.makeText(this, "Recurrence date can't be before alarm start date!", Toast.LENGTH_LONG).show();
       } else {
-        dateTime.set(YEAR, selected.get(YEAR));
-        dateTime.set(MONTH, selected.get(MONTH));
-        dateTime.set(DATE, selected.get(DATE));
+        // Apply UTC date components to the target dateTime (preserving existing time)
+        dateTime.set(YEAR, utcCalendar.get(YEAR));
+        dateTime.set(MONTH, utcCalendar.get(MONTH));
+        dateTime.set(DATE, utcCalendar.get(DATE));
         dateTime.set(SECOND, 0);
         dateTime.set(MILLISECOND, 0);
         updateView.run();

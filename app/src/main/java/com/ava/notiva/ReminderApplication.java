@@ -34,8 +34,12 @@ public class ReminderApplication extends Application implements Configuration.Pr
   @Override
   public void onCreate() {
     super.onCreate();
+    // WorkManager enforces a minimum interval of 15 minutes for periodic work.
+    // Requesting a shorter interval (e.g., 1 minute) is silently increased to 15 minutes.
+    // For time-sensitive reminders, the actual precision comes from AlarmManager
+    // used in snooze functionality and could be extended for all reminders if needed.
     PeriodicWorkRequest periodicWorkRequest =
-        new PeriodicWorkRequest.Builder(ReminderTriggerWorker.class, 1, TimeUnit.MINUTES)
+        new PeriodicWorkRequest.Builder(ReminderTriggerWorker.class, 15, TimeUnit.MINUTES)
             .build();
     WorkManager.getInstance(this).enqueueUniquePeriodicWork(
         "ReminderSync",

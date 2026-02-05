@@ -148,18 +148,36 @@ public class ReminderModel {
     if (recurrenceType == RecurrenceType.NEVER || recurrenceType == RecurrenceType.FOREVER || recurrenceDelay <= 0) {
       return startDateTime.after(now) ? (Calendar) startDateTime.clone() : null;
     }
-    long startMillis = startDateTime.getTimeInMillis();
-    long nowMillis = now.getTimeInMillis();
-    long interval = recurrenceType.getMillis() * recurrenceDelay;
+
     Calendar next = (Calendar) startDateTime.clone();
     Calendar end = recurrenceType == RecurrenceType.FOREVER ? null : endDateTime;
-    if (startMillis > nowMillis) {
-      next.setTimeInMillis(startMillis);
+
+    // For MONTH/YEAR, use Calendar.add() to handle variable-length periods correctly
+    // For MINUTE/HOUR/DAY, use millisecond math (fixed-length periods)
+    if (recurrenceType == RecurrenceType.MONTH || recurrenceType == RecurrenceType.YEAR) {
+      int calendarField = recurrenceType == RecurrenceType.MONTH ? Calendar.MONTH : Calendar.YEAR;
+      // Iterate forward until we find the next occurrence after 'now'
+      while (!next.after(now)) {
+        next.add(calendarField, recurrenceDelay);
+        // Safety check to prevent infinite loop if end date is in the past
+        if (end != null && next.after(end)) {
+          return null;
+        }
+      }
     } else {
-      long intervalsPassed = (nowMillis - startMillis) / interval;
-      long nextMillis = startMillis + (intervalsPassed + 1) * interval;
-      next.setTimeInMillis(nextMillis);
+      // MINUTE, HOUR, DAY - use fixed millisecond intervals
+      long startMillis = startDateTime.getTimeInMillis();
+      long nowMillis = now.getTimeInMillis();
+      long interval = recurrenceType.getMillis() * recurrenceDelay;
+      if (startMillis > nowMillis) {
+        next.setTimeInMillis(startMillis);
+      } else {
+        long intervalsPassed = (nowMillis - startMillis) / interval;
+        long nextMillis = startMillis + (intervalsPassed + 1) * interval;
+        next.setTimeInMillis(nextMillis);
+      }
     }
+
     if (end != null && next.after(end)) {
       return null;
     }

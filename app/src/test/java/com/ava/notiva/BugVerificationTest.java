@@ -177,10 +177,10 @@ public class BugVerificationTest {
     }
 
     /**
-     * Bug #8: Demonstrate actual drift for monthly reminder
+     * Bug #8: Monthly reminder now uses Calendar.add() for accurate scheduling - FIXED
      */
     @Test
-    public void bug8_monthlyReminder_driftsOverTime() {
+    public void bug8_monthlyReminder_noLongerDrifts() {
         ReminderModel reminder = new ReminderModel();
 
         // Start on Jan 15, 2024
@@ -200,15 +200,14 @@ public class BugVerificationTest {
 
         Calendar next = reminder.getNextOccurrenceAfter(march1);
 
-        // Expected by calendar logic: March 15
+        // FIXED: Now uses Calendar.add(MONTH, 1) so it correctly returns March 15
+        // Jan 15 + 1 month = Feb 15
+        // Feb 15 + 1 month = March 15 (correct!)
         Calendar expectedMarch15 = Calendar.getInstance();
         expectedMarch15.set(2024, Calendar.MARCH, 15, 10, 0, 0);
         expectedMarch15.set(Calendar.MILLISECOND, 0);
 
-        // Actual result will be different due to fixed 31-day intervals
-        // Jan 15 + 31 days = Feb 15
-        // Feb 15 + 31 days = March 17 (not March 15!)
-        assertNotEquals("Monthly reminder drifts due to fixed 31-day interval",
+        assertEquals("Monthly reminder should land on March 15 (no drift)",
                 expectedMarch15.getTimeInMillis(), next.getTimeInMillis());
     }
 

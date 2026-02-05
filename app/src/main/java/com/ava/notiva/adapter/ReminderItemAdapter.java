@@ -59,7 +59,12 @@ public class ReminderItemAdapter
       holder.alarmName.setText(name);
     }
 
-    Calendar nextOccurrence = reminder.getStartDateTime();
+    // Use getNextOccurrenceAfter() to show the actual next trigger time, not the original start
+    Calendar nextOccurrence = reminder.getNextOccurrenceAfter(Calendar.getInstance());
+    if (nextOccurrence == null) {
+      // Fallback for non-recurring or expired reminders
+      nextOccurrence = reminder.getStartDateTime();
+    }
     String nextOccurrenceStr = DateTimeDisplayUtil.getFriendlyDateTimeSingleLine(context, nextOccurrence);
     holder.nextOccurrence.setText(nextOccurrenceStr);
 
