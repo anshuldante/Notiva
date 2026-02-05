@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Developers can quickly understand how the app works and confidently make changes without breaking existing functionality.
-**Current focus:** Phase 4 - Database Reference
+**Current focus:** Phase 5 - Testing Guide
 
 ## Current Position
 
-Phase: 4 of 10 (Database Reference)
+Phase: 5 of 10 (Testing Guide)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-02-05 - Completed 04-01-PLAN.md (Database Reference Documentation)
+Last activity: 2026-02-05 - Completed 05-01-PLAN.md (Testing Guide Documentation)
 
-Progress: [####......] 40%
+Progress: [#####.....] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 2 min
-- Total execution time: 8 min
+- Total execution time: 10 min
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [####......] 40%
 | 02-setup-guide | 1 | 2 min | 2 min |
 | 03-architecture-overview | 1 | 2 min | 2 min |
 | 04-database-reference | 1 | 2 min | 2 min |
+| 05-testing-guide | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 02-01 (2 min), 03-01 (2 min), 04-01 (2 min)
+- Last 5 plans: 01-01 (2 min), 02-01 (2 min), 03-01 (2 min), 04-01 (2 min), 05-01 (2 min)
 - Trend: Consistent pace
 
 *Updated after each plan completion*
@@ -59,6 +60,8 @@ Recent decisions affecting current work:
 - [04-01]: Documented RecurrenceType millisecond values explicitly for timing calculations
 - [04-01]: Included 3 practical query examples (active reminders, time range, aggregation)
 - [04-01]: Added best practices for threading, testing, migrations, and indexes
+- [05-01]: Provided Java templates for unit, instrumented, database, and UI tests
+- [05-01]: Documented standard Android test directory structure (test/ vs androidTest/)
 
 ### Pending Todos
 
@@ -71,5 +74,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 04-01-PLAN.md (Database Reference Documentation)
+Stopped at: Completed 05-01-PLAN.md (Testing Guide Documentation)
 Resume file: None
