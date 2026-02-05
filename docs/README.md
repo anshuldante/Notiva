@@ -55,7 +55,7 @@ cd my-reminder-app
 | [UI.md](UI.md) | Planned | UI components and navigation |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Planned | Contribution guidelines |
 | [features/REMINDERS.md](features/REMINDERS.md) | Available | Reminder CRUD operations |
-| [features/NOTIFICATIONS.md](features/NOTIFICATIONS.md) | Planned | Notification system |
+| [features/NOTIFICATIONS.md](features/NOTIFICATIONS.md) | Available | Notification system |
 | [features/RECURRENCE.md](features/RECURRENCE.md) | Planned | Recurrence patterns |
 
 ## Tech Stack
@@ -106,4 +106,4 @@ my-reminder-app/
 
 ---
 
-*Documentation last updated: 2026-02-05 - Added Reminders Feature documentation*
+*Documentation last updated: 2026-02-05 - Added Notifications Feature documentation*
