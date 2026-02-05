@@ -139,10 +139,10 @@ Plans:
   3. WorkManager scheduling integration is documented
   4. Android constraints documented (doze mode, battery optimization, reboot handling)
   5. Developer knows why WorkManager was chosen over AlarmManager
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 08-01: Create recurrence and constraints documentation
+- [ ] 08-01-PLAN.md — Create recurrence and constraints documentation with RecurrenceType reference and Android constraints
 
 ### Phase 9: UI Documentation
 **Goal**: Developers understand screens, layouts, and navigation patterns
@@ -188,10 +188,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Testing Guide | 1/1 | Complete ✓ | 2026-02-05 |
 | 6. Reminders Feature | 1/1 | Complete ✓ | 2026-02-05 |
 | 7. Notifications Feature | 1/1 | Complete ✓ | 2026-02-05 |
-| 8. Recurrence and Constraints | 0/1 | Not started | - |
+| 8. Recurrence and Constraints | 0/1 | Planned | - |
 | 9. UI Documentation | 0/1 | Not started | - |
 | 10. Code Examples and Contributing | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 7 completion*
+*Last updated: 2026-02-05 after Phase 8 planning*
