@@ -109,10 +109,10 @@ Plans:
   3. Reminder lifecycle states are explained
   4. Sequence diagram shows create/edit/delete flows
   5. Developer can trace a reminder creation through the code
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 06-01: Create reminders feature documentation
+- [ ] 06-01-PLAN.md — Create reminders feature documentation with CRUD flows and lifecycle states
 
 ### Phase 7: Notifications Feature
 **Goal**: Developers understand how notifications are triggered and displayed
@@ -186,7 +186,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Architecture Overview | 1/1 | Complete ✓ | 2026-02-05 |
 | 4. Database Reference | 1/1 | Complete ✓ | 2026-02-05 |
 | 5. Testing Guide | 1/1 | Complete ✓ | 2026-02-05 |
-| 6. Reminders Feature | 0/1 | Not started | - |
+| 6. Reminders Feature | 0/1 | Planned | - |
 | 7. Notifications Feature | 0/1 | Not started | - |
 | 8. Recurrence and Constraints | 0/1 | Not started | - |
 | 9. UI Documentation | 0/1 | Not started | - |
@@ -194,4 +194,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 5 completion*
+*Last updated: 2026-02-05 after Phase 6 planning*
