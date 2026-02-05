@@ -200,11 +200,12 @@ reminderDao.updateSnoozedUntil(notificationId, null);  // Clear snooze state
 
 ---
 
-## Medium Bugs (NOT YET FIXED)
+## Medium Bugs
 
 ### 6. Potential NullPointerException in NotificationStarterService
-**Status:** ❌ Open
-**File:** `NotificationStarterService.java:71`
+**Status:** ✅ FIXED
+**Commit:** `25c9a4d` fix: resolve bugs #6, #7, #12, #13, #14
+**File:** `NotificationStarterService.java:79-85`
 
 **Description:** The intent is accessed without null check:
 ```java
@@ -215,9 +216,10 @@ public int onStartCommand(Intent intent, int flags, int startId) {
 
 **Impact:** In edge cases (e.g., service restart by system after being killed), `intent` can be null, causing a crash.
 
-**Proposed Fix:**
+**Fix Applied:**
 ```java
 if (intent == null) {
+  Log.w(TAG, "onStartCommand received null intent, stopping service");
   stopSelf();
   return START_NOT_STICKY;
 }
@@ -226,8 +228,9 @@ if (intent == null) {
 ---
 
 ### 7. NullPointerException in ReminderModel.equals()
-**Status:** ❌ Open
-**File:** `ReminderModel.java:177`
+**Status:** ✅ FIXED
+**Commit:** `25c9a4d` fix: resolve bugs #6, #7, #12, #13, #14
+**File:** `ReminderModel.java:194`
 
 **Description:** Inconsistent null handling in equals():
 ```java
@@ -239,7 +242,7 @@ if (intent == null) {
 
 **Impact:** If `startDateTime` is null, calling `equals()` throws NPE. Other fields use `Objects.equals()` for null safety but this one doesn't.
 
-**Proposed Fix:** Change to `Objects.equals(startDateTime, that.startDateTime)`.
+**Fix Applied:** Changed to `Objects.equals(startDateTime, that.startDateTime)`.
 
 ---
 
@@ -311,8 +314,9 @@ String nextOccurrenceStr = DateTimeDisplayUtil.getFriendlyDateTimeSingleLine(con
 ---
 
 ### 12. Vibration Pattern Doesn't Repeat
-**Status:** ❌ Open
-**File:** `NotificationStarterService.java:187`
+**Status:** ✅ FIXED
+**Commit:** `25c9a4d` fix: resolve bugs #6, #7, #12, #13, #14
+**File:** `NotificationStarterService.java:216`
 
 **Description:** Vibration only plays once:
 ```java
@@ -321,14 +325,15 @@ vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
 
 **Impact:** The `-1` means no repeat. For an alarm notification, vibration should continue until dismissed to properly get user attention, especially for important reminders.
 
-**Proposed Fix:** Use a positive repeat index: `VibrationEffect.createWaveform(pattern, 0)` to repeat from the beginning.
+**Fix Applied:** Changed to `VibrationEffect.createWaveform(pattern, 0)` to repeat from the beginning.
 
 ---
 
-## Low Priority Issues (NOT YET FIXED)
+## Low Priority Issues
 
 ### 13. Typo in RecurrenceType Enum
-**Status:** ❌ Open
+**Status:** ✅ FIXED
+**Commit:** `25c9a4d` fix: resolve bugs #6, #7, #12, #13, #14
 **File:** `RecurrenceType.java:8`
 
 **Description:**
@@ -338,13 +343,14 @@ MONTH("Months(s)"),  // Should be "Month(s)"
 
 **Impact:** The displayed text has an extra 's', showing "Months(s)" instead of "Month(s)". Cosmetic UI issue only.
 
-**Proposed Fix:** Change to `MONTH("Month(s)")`.
+**Fix Applied:** Changed to `MONTH("Month(s)")`.
 
 ---
 
 ### 14. Unnecessary endDateTime Initialization
-**Status:** ❌ Open
-**File:** `ReminderModel.java:42-43`
+**Status:** ✅ FIXED
+**Commit:** `25c9a4d` fix: resolve bugs #6, #7, #12, #13, #14
+**File:** `ReminderModel.java:45`
 
 **Description:** Default constructor initializes `endDateTime` to current time:
 ```java
@@ -358,7 +364,7 @@ public ReminderModel() {
 
 **Impact:** Non-recurring reminders will have an `endDateTime` value set even though it's not used, potentially causing confusion in the data layer. Code quality concern.
 
-**Proposed Fix:** Only initialize `endDateTime` when recurrence is explicitly enabled, or set to `null` by default.
+**Fix Applied:** Changed to `this.endDateTime = null;  // Only set when recurrence end is explicitly configured`.
 
 ---
 
@@ -367,12 +373,12 @@ public ReminderModel() {
 | Severity | Total | Fixed | Remaining |
 |----------|-------|-------|-----------|
 | Critical | 5 | 5 | 0 |
-| Medium | 7 | 0 | 7 |
-| Low | 2 | 0 | 2 |
+| Medium | 7 | 3 | 4 |
+| Low | 2 | 2 | 0 |
 
 **Total bugs found: 14**
-**Total bugs fixed: 5**
-**Remaining: 9**
+**Total bugs fixed: 10**
+**Remaining: 4**
 
 ---
 
@@ -386,6 +392,11 @@ public ReminderModel() {
 | 2026-02-05 | #4 | `a128c1b` | Implement actual 10-minute snooze delay using AlarmManager |
 | 2026-02-05 | #4 | `9b781e2` | Add snooze tracking to prevent duplicate alarms |
 | 2026-02-05 | #5 | `f51915a` | Add RECEIVE_BOOT_COMPLETED permission to manifest |
+| 2026-02-05 | #6 | `25c9a4d` | Add null intent check in NotificationStarterService |
+| 2026-02-05 | #7 | `25c9a4d` | Fix NPE in ReminderModel.equals() with null startDateTime |
+| 2026-02-05 | #12 | `25c9a4d` | Fix vibration pattern to repeat continuously |
+| 2026-02-05 | #13 | `25c9a4d` | Fix typo "Months(s)" to "Month(s)" |
+| 2026-02-05 | #14 | `25c9a4d` | Initialize endDateTime to null by default |
 
 ---
 
