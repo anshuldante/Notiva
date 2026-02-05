@@ -247,8 +247,9 @@ if (intent == null) {
 ---
 
 ### 8. Inaccurate Month/Year Duration Calculations
-**Status:** ❌ Open
-**File:** `RecurrenceType.java:47-48`
+**Status:** ✅ FIXED
+**Commit:** `c27651d` fix: resolve remaining bugs #8, #9, #10, #11
+**File:** `ReminderModel.java:143-185`
 
 **Description:** Fixed millisecond values for variable-length periods:
 ```java
@@ -261,13 +262,14 @@ case YEAR -> 31_622_400_000L; // 366 days
 - Year calculation uses 366 days (leap year), but most years have 365 days
 - Over time, recurring reminders will shift from their intended schedule (e.g., "every month on the 15th" will drift)
 
-**Proposed Fix:** Use `Calendar.add()` to properly handle date arithmetic instead of fixed milliseconds. This requires refactoring `getNextOccurrenceAfter()`.
+**Fix Applied:** Refactored `getNextOccurrenceAfter()` to use `Calendar.add()` for MONTH/YEAR recurrence types. MINUTE/HOUR/DAY continue using millisecond math (fixed-length periods). Monthly reminder on the 15th now correctly stays on the 15th.
 
 ---
 
 ### 9. MaterialDatePicker Timezone Issue
-**Status:** ❌ Open
-**File:** `UpsertReminderActivity.java:257-259`
+**Status:** ✅ FIXED
+**Commit:** `c27651d` fix: resolve remaining bugs #8, #9, #10, #11
+**File:** `UpsertReminderActivity.java:258-282`
 
 **Description:**
 ```java
@@ -278,13 +280,21 @@ datePicker.addOnPositiveButtonClickListener(selection -> {
 
 **Impact:** MaterialDatePicker returns dates as UTC midnight timestamps. Setting this directly can cause off-by-one-day errors depending on the device's timezone (e.g., user in UTC-5 selects Jan 15, but gets Jan 14).
 
-**Proposed Fix:** Extract date components in UTC, then construct local Calendar with those components.
+**Fix Applied:** Extract date components using UTC timezone before applying to local Calendar:
+```java
+Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+utcCalendar.setTimeInMillis(selection);
+dateTime.set(YEAR, utcCalendar.get(YEAR));
+dateTime.set(MONTH, utcCalendar.get(MONTH));
+dateTime.set(DATE, utcCalendar.get(DATE));
+```
 
 ---
 
 ### 10. WorkManager Minimum Interval Ignored
-**Status:** ❌ Open
-**File:** `ReminderApplication.java:38`
+**Status:** ✅ FIXED
+**Commit:** `c27651d` fix: resolve remaining bugs #8, #9, #10, #11
+**File:** `ReminderApplication.java:38-42`
 
 **Description:**
 ```java
@@ -293,13 +303,18 @@ new PeriodicWorkRequest.Builder(ReminderTriggerWorker.class, 1, TimeUnit.MINUTES
 
 **Impact:** WorkManager enforces a minimum interval of 15 minutes for periodic work. The 1-minute interval is silently increased to 15 minutes. This means reminders may fire up to 15 minutes late, which could be significant for time-sensitive reminders.
 
-**Proposed Fix:** Document this limitation or use AlarmManager for more frequent/precise scheduling.
+**Fix Applied:** Changed interval to 15 minutes to be explicit about actual behavior. Added comment documenting WorkManager limitation:
+```java
+// WorkManager enforces a minimum interval of 15 minutes for periodic work.
+new PeriodicWorkRequest.Builder(ReminderTriggerWorker.class, 15, TimeUnit.MINUTES)
+```
 
 ---
 
 ### 11. Wrong Next Occurrence Displayed in List
-**Status:** ❌ Open
-**File:** `ReminderItemAdapter.java:62-63`
+**Status:** ✅ FIXED
+**Commit:** `c27651d` fix: resolve remaining bugs #8, #9, #10, #11
+**File:** `ReminderItemAdapter.java:62-68`
 
 **Description:** The adapter displays `startDateTime` instead of the actual next occurrence:
 ```java
@@ -309,7 +324,13 @@ String nextOccurrenceStr = DateTimeDisplayUtil.getFriendlyDateTimeSingleLine(con
 
 **Impact:** For recurring reminders, the displayed time shows the original start time, not when the reminder will actually fire next. This is confusing for users but the reminder still fires at the correct time.
 
-**Proposed Fix:** Use `reminder.getNextOccurrenceAfter(Calendar.getInstance())` to get the actual next trigger time.
+**Fix Applied:** Use `getNextOccurrenceAfter()` to show actual next trigger time:
+```java
+Calendar nextOccurrence = reminder.getNextOccurrenceAfter(Calendar.getInstance());
+if (nextOccurrence == null) {
+  nextOccurrence = reminder.getStartDateTime();  // Fallback for expired/non-recurring
+}
+```
 
 ---
 
@@ -373,12 +394,12 @@ public ReminderModel() {
 | Severity | Total | Fixed | Remaining |
 |----------|-------|-------|-----------|
 | Critical | 5 | 5 | 0 |
-| Medium | 7 | 3 | 4 |
+| Medium | 7 | 7 | 0 |
 | Low | 2 | 2 | 0 |
 
 **Total bugs found: 14**
-**Total bugs fixed: 10**
-**Remaining: 4**
+**Total bugs fixed: 14**
+**Remaining: 0** ✅
 
 ---
 
@@ -397,6 +418,10 @@ public ReminderModel() {
 | 2026-02-05 | #12 | `25c9a4d` | Fix vibration pattern to repeat continuously |
 | 2026-02-05 | #13 | `25c9a4d` | Fix typo "Months(s)" to "Month(s)" |
 | 2026-02-05 | #14 | `25c9a4d` | Initialize endDateTime to null by default |
+| 2026-02-05 | #8 | `c27651d` | Use Calendar.add() for accurate month/year recurrence |
+| 2026-02-05 | #9 | `c27651d` | Fix MaterialDatePicker UTC timezone issue |
+| 2026-02-05 | #10 | `c27651d` | Use explicit 15-minute WorkManager interval |
+| 2026-02-05 | #11 | `c27651d` | Show actual next occurrence in reminder list |
 
 ---
 
