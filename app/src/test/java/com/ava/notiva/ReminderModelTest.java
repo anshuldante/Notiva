@@ -248,13 +248,11 @@ public class ReminderModelTest {
 
     // ==================== getNextOccurrenceAfter - FOREVER recurrence ====================
 
-    @Test(expected = ArithmeticException.class)
-    public void getNextOccurrence_foreverRecurrence_withPastStart_throwsArithmeticException() {
-        // NOTE: This test documents a bug in the implementation.
-        // FOREVER has getMillis() = 0, which causes division by zero when start is in the past.
-        // The calculation: intervalsPassed = (nowMillis - startMillis) / interval
-        // When interval = 0, this throws ArithmeticException.
-        // This should be fixed in the application code to handle FOREVER differently.
+    @Test
+    public void getNextOccurrence_foreverRecurrence_withPastStart_returnsNull() {
+        // FIXED: FOREVER with past start now returns null instead of throwing ArithmeticException.
+        // FOREVER means "no end date" and is treated as a one-time reminder.
+        // If start is in the past, there's no next occurrence.
 
         Calendar pastStart = (Calendar) now.clone();
         pastStart.add(Calendar.DAY_OF_YEAR, -30); // Started 30 days ago
@@ -267,8 +265,9 @@ public class ReminderModelTest {
         reminder.setRecurrenceDelay(1);
         reminder.setEndDateTime(pastEnd);
 
-        // This will throw ArithmeticException due to division by zero
-        reminder.getNextOccurrenceAfter(now);
+        // FIXED: Now returns null instead of throwing ArithmeticException
+        Calendar result = reminder.getNextOccurrenceAfter(now);
+        assertNull("FOREVER with past start should return null", result);
     }
 
     @Test

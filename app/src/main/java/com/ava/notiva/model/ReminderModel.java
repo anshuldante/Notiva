@@ -129,7 +129,8 @@ public class ReminderModel {
     if (startDateTime == null) {
       return null;
     }
-    if (recurrenceType == RecurrenceType.NEVER || recurrenceDelay <= 0) {
+    // NEVER/FOREVER have getMillis()=0, treat as one-time reminders
+    if (recurrenceType == RecurrenceType.NEVER || recurrenceType == RecurrenceType.FOREVER || recurrenceDelay <= 0) {
       return startDateTime.after(now) ? (Calendar) startDateTime.clone() : null;
     }
     long startMillis = startDateTime.getTimeInMillis();

@@ -31,14 +31,14 @@ public class BugVerificationTest {
     // ==================== Bug #1: FOREVER Recurrence ArithmeticException ====================
 
     /**
-     * Bug #1: FOREVER recurrence with past start date causes ArithmeticException
+     * Bug #1: FOREVER recurrence with past start date - FIXED
      * File: ReminderModel.java:143
      *
-     * Current behavior: Throws ArithmeticException (division by zero)
-     * Expected behavior: Should handle FOREVER gracefully (return start time or next appropriate time)
+     * Previous behavior: Threw ArithmeticException (division by zero)
+     * Fixed behavior: Returns null for past start (no next occurrence)
      */
-    @Test(expected = ArithmeticException.class)
-    public void bug1_foreverRecurrence_pastStart_throwsArithmeticException() {
+    @Test
+    public void bug1_foreverRecurrence_pastStart_returnsNull() {
         ReminderModel reminder = new ReminderModel();
         Calendar pastStart = (Calendar) now.clone();
         pastStart.add(Calendar.DAY_OF_YEAR, -30);
@@ -48,9 +48,9 @@ public class BugVerificationTest {
         reminder.setRecurrenceDelay(1);
         reminder.setEndDateTime(null);
 
-        // This throws ArithmeticException because FOREVER.getMillis() returns 0
-        // causing division by zero in: (nowMillis - startMillis) / interval
-        reminder.getNextOccurrenceAfter(now);
+        // FIXED: Now returns null instead of throwing ArithmeticException
+        Calendar result = reminder.getNextOccurrenceAfter(now);
+        assertNull("FOREVER with past start should return null (no next occurrence)", result);
     }
 
     /**
