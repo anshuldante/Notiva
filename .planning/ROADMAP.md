@@ -169,10 +169,10 @@ Plans:
   3. Commit message conventions are documented
   4. Documentation contribution process is included
   5. New contributor can submit their first PR following the guide
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 10-01: Add code examples and create contributing guide
+- [ ] 10-01-PLAN.md — Create CODE_EXAMPLES.md with key patterns and CONTRIBUTING.md with guidelines
 
 ## Progress
 
@@ -190,8 +190,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Notifications Feature | 1/1 | Complete ✓ | 2026-02-05 |
 | 8. Recurrence and Constraints | 1/1 | Complete ✓ | 2026-02-05 |
 | 9. UI Documentation | 1/1 | Complete ✓ | 2026-02-05 |
-| 10. Code Examples and Contributing | 0/1 | Not started | - |
+| 10. Code Examples and Contributing | 0/1 | Planned | - |
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 9 completion*
+*Last updated: 2026-02-05 after Phase 10 planning*
