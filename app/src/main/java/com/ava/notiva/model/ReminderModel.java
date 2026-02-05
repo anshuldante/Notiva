@@ -36,6 +36,9 @@ public class ReminderModel {
   @ColumnInfo(name = "end_date")
   private Calendar endDateTime;
 
+  @ColumnInfo(name = "snoozed_until")
+  private Long snoozedUntil;  // Timestamp until which reminder is snoozed, null = not snoozed
+
   public ReminderModel() {
     this.active = true;
     this.recurrenceType = RecurrenceType.DAY;
@@ -125,6 +128,18 @@ public class ReminderModel {
     this.endDateTime = endDateTime;
   }
 
+  public Long getSnoozedUntil() {
+    return snoozedUntil;
+  }
+
+  public void setSnoozedUntil(Long snoozedUntil) {
+    this.snoozedUntil = snoozedUntil;
+  }
+
+  public boolean isSnoozed() {
+    return snoozedUntil != null && snoozedUntil > System.currentTimeMillis();
+  }
+
   public Calendar getNextOccurrenceAfter(Calendar now) {
     if (startDateTime == null) {
       return null;
@@ -162,6 +177,7 @@ public class ReminderModel {
         + ", recurrenceDelay=" + recurrenceDelay
         + ", recurrenceType=" + recurrenceType
         + ", endDateTime=" + (endDateTime != null ? endDateTime.getTime() : "null")
+        + ", snoozedUntil=" + snoozedUntil
         + '}';
   }
 
@@ -177,12 +193,13 @@ public class ReminderModel {
         && Objects.equals(name, that.name)
         && startDateTime.equals(that.startDateTime)
         && recurrenceType == that.recurrenceType
-        && Objects.equals(endDateTime, that.endDateTime);
+        && Objects.equals(endDateTime, that.endDateTime)
+        && Objects.equals(snoozedUntil, that.snoozedUntil);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        id, active, name, startDateTime, recurrenceDelay, recurrenceType, endDateTime);
+        id, active, name, startDateTime, recurrenceDelay, recurrenceType, endDateTime, snoozedUntil);
   }
 }

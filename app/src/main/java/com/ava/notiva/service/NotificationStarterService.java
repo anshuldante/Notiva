@@ -34,12 +34,21 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.ava.notiva.R;
+import com.ava.notiva.data.ReminderDao;
 
 import java.util.Date;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class NotificationStarterService extends Service {
 
   public static final String TAG = "Notiva.NotificationStarterService";
+
+  @Inject
+  ReminderDao reminderDao;
 
   private MediaPlayer mediaPlayer;
   private Vibrator vibrator;
@@ -72,6 +81,19 @@ public class NotificationStarterService extends Service {
     notificationName = intent.getStringExtra(REMINDER_NAME);
     Log.i(TAG, "Inside onStartCommand, creating a notification for ID: " + notificationId);
     Log.i(TAG, "Starting alarm at: " + new Date());
+
+    // Clear snooze state since the alarm is now firing
+    if (notificationId != -1) {
+      new Thread(() -> {
+        try {
+          reminderDao.updateSnoozedUntil(notificationId, null);
+          Log.i(TAG, "Cleared snooze state for reminder " + notificationId);
+        } catch (Exception e) {
+          Log.e(TAG, "Failed to clear snooze state for reminder " + notificationId, e);
+        }
+      }).start();
+    }
+
     startForeground(notificationId, buildNotification());
 
     if (mediaPlayer == null) {

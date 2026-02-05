@@ -13,9 +13,19 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.ava.notiva.data.ReminderDao;
+
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class NotificationStopperService extends Service {
 
   public static final String TAG = "Notiva.NotificationStopperService";
+
+  @Inject
+  ReminderDao reminderDao;
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -50,6 +60,16 @@ public class NotificationStopperService extends Service {
     // Schedule alarm for 10 minutes from now
     long snoozeDelayMillis = 10 * 60 * 1000L;
     long snoozeTime = System.currentTimeMillis() + snoozeDelayMillis;
+
+    // Mark reminder as snoozed in database so regular scheduling skips it
+    new Thread(() -> {
+      try {
+        reminderDao.updateSnoozedUntil(reminderId, snoozeTime);
+        Log.i(TAG, "Set snoozedUntil=" + snoozeTime + " for reminder " + reminderId);
+      } catch (Exception e) {
+        Log.e(TAG, "Failed to update snoozedUntil for reminder " + reminderId, e);
+      }
+    }).start();
 
     AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     Intent alarmIntent = new Intent(this, NotificationStarterService.class);
