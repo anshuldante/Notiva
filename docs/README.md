@@ -41,7 +41,8 @@ cd my-reminder-app
 | Understand notifications | [Notifications Feature](features/NOTIFICATIONS.md) |
 | Learn about recurrence logic | [Recurrence & Constraints](features/RECURRENCE.md) |
 | See the UI structure | [UI Documentation](UI.md) |
-| Contribute to the project | [Contributing Guide](CONTRIBUTING.md) |
+| Find code examples | [Code Examples](CODE_EXAMPLES.md) |
+| Contribute to the project | [Contributing Guide](../CONTRIBUTING.md) |
 
 ## Documentation Status
 
@@ -53,7 +54,8 @@ cd my-reminder-app
 | [DATABASE.md](DATABASE.md) | Available | Room schema and migrations |
 | [TESTING.md](TESTING.md) | Available | Testing strategy and guides |
 | [UI.md](UI.md) | Available | UI components and navigation |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Planned | Contribution guidelines |
+| [CODE_EXAMPLES.md](CODE_EXAMPLES.md) | Available | Implementation patterns and code snippets |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | Available | Contribution guidelines |
 | [features/REMINDERS.md](features/REMINDERS.md) | Available | Reminder CRUD operations |
 | [features/NOTIFICATIONS.md](features/NOTIFICATIONS.md) | Available | Notification system |
 | [features/RECURRENCE.md](features/RECURRENCE.md) | Available | Recurrence patterns |
@@ -102,8 +104,8 @@ my-reminder-app/
 - **Setup issues**: Start with [SETUP.md](SETUP.md)
 - **Architecture questions**: See [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Database questions**: Check [DATABASE.md](DATABASE.md)
-- **Want to contribute**: Read [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Want to contribute**: Read [CONTRIBUTING.md](../CONTRIBUTING.md)
 
 ---
 
-*Documentation last updated: 2026-02-05 - Added UI documentation*
+*Documentation last updated: 2026-02-05 - Added CODE_EXAMPLES.md and CONTRIBUTING.md*
