@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Developers can quickly understand how the app works and confidently make changes without breaking existing functionality.
-**Current focus:** Phase 7 - Notifications Feature
+**Current focus:** Phase 8 - Recurrence and Constraints
 
 ## Current Position
 
-Phase: 7 of 10 (Notifications Feature)
+Phase: 8 of 10 (Recurrence and Constraints)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-02-05 - Completed 07-01-PLAN.md (Notifications Feature Documentation)
+Last activity: 2026-02-05 - Completed 08-01-PLAN.md (Recurrence and Constraints Documentation)
 
-Progress: [#######...] 70%
+Progress: [########..] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 2 min
-- Total execution time: 16 min
+- Total execution time: 19 min
 
 **By Phase:**
 
@@ -34,9 +34,10 @@ Progress: [#######...] 70%
 | 05-testing-guide | 1 | 2 min | 2 min |
 | 06-reminders-feature | 1 | 3 min | 3 min |
 | 07-notifications-feature | 1 | 3 min | 3 min |
+| 08-recurrence-and-constraints | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (2 min), 04-01 (2 min), 05-01 (2 min), 06-01 (3 min), 07-01 (3 min)
+- Last 5 plans: 04-01 (2 min), 05-01 (2 min), 06-01 (3 min), 07-01 (3 min), 08-01 (3 min)
 - Trend: Consistent pace
 
 *Updated after each plan completion*
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - [07-01]: Documented vibration pattern {0, 500, 300, 500} from actual code
 - [07-01]: Included debugging guide with 4 common issues and adb commands
 - [07-01]: Documented snooze toast message as code shows (10 minutes)
+- [08-01]: Documented MONTH (31-day) and YEAR (366-day) approximations explicitly
+- [08-01]: Explained WorkManager + AlarmManager hybrid architecture with clear rationale
+- [08-01]: Covered 5 Android constraints: Doze, battery, exact alarms, boot, foreground service
 
 ### Pending Todos
 
@@ -82,5 +86,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Completed 07-01-PLAN.md (Notifications Feature Documentation)
+Stopped at: Completed 08-01-PLAN.md (Recurrence and Constraints Documentation)
 Resume file: None
