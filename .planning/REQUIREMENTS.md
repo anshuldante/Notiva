@@ -18,7 +18,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **REF-01**: Database schema documentation with Room entities and relationships ✓
 - [x] **REF-02**: ER diagram for Room schema using Mermaid ✓
-- [ ] **REF-03**: Testing guide covering unit tests, instrumented tests, and how to run them
+- [x] **REF-03**: Testing guide covering unit tests, instrumented tests, and how to run them ✓
 
 ### Features
 
@@ -68,7 +68,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-04 | Phase 10 | Pending |
 | REF-01 | Phase 4 | Complete |
 | REF-02 | Phase 4 | Complete |
-| REF-03 | Phase 5 | Pending |
+| REF-03 | Phase 5 | Complete |
 | FEAT-01 | Phase 6 | Pending |
 | FEAT-02 | Phase 7 | Pending |
 | FEAT-03 | Phase 8 | Pending |
@@ -84,4 +84,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 4 completion*
+*Last updated: 2026-02-05 after Phase 5 completion*
