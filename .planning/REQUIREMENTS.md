@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **FOUND-01**: README.md with project overview, badges, and quick start link ✓
 - [x] **FOUND-02**: Setup instructions covering prerequisites, clone, build, and first run ✓
 - [x] **FOUND-03**: Architecture overview with Mermaid component diagram showing layers and patterns ✓
-- [ ] **FOUND-04**: CONTRIBUTING.md with PR process, code style guide, and commit conventions
+- [x] **FOUND-04**: CONTRIBUTING.md with PR process, code style guide, and commit conventions ✓
 
 ### Reference
 
@@ -26,7 +26,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **FEAT-02**: Notifications feature documentation with triggers, channels, and permissions ✓
 - [x] **FEAT-03**: Recurrence logic documentation with types, scheduling, and WorkManager integration ✓
 - [x] **FEAT-04**: Android-specific constraints documented (doze mode, battery optimization, permissions) ✓
-- [ ] **FEAT-05**: Code examples referencing actual source files for key patterns
+- [x] **FEAT-05**: Code examples referencing actual source files for key patterns ✓
 
 ### UI
 
@@ -65,7 +65,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 2 | Complete |
 | FOUND-03 | Phase 3 | Complete |
-| FOUND-04 | Phase 10 | Pending |
+| FOUND-04 | Phase 10 | Complete |
 | REF-01 | Phase 4 | Complete |
 | REF-02 | Phase 4 | Complete |
 | REF-03 | Phase 5 | Complete |
@@ -73,7 +73,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FEAT-02 | Phase 7 | Complete |
 | FEAT-03 | Phase 8 | Complete |
 | FEAT-04 | Phase 8 | Complete |
-| FEAT-05 | Phase 10 | Pending |
+| FEAT-05 | Phase 10 | Complete |
 | UI-01 | Phase 9 | Complete |
 | UI-02 | Phase 9 | Complete |
 
@@ -84,4 +84,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 9 completion*
+*Last updated: 2026-02-05 after Phase 10 completion - ALL v1 REQUIREMENTS COMPLETE*
