@@ -64,7 +64,48 @@ if (!text.isEmpty()) {
 
 ---
 
-### 4. Wrong Next Occurrence Displayed in List
+### 4. FOREVER Recurrence Causes ArithmeticException (Division by Zero)
+**File:** `ReminderModel.java:143`
+
+**Description:** When calculating the next occurrence for a `FOREVER` recurrence type with a past start date, the code throws `ArithmeticException`:
+```java
+long interval = recurrenceType.getMillis() * recurrenceDelay;  // interval = 0 for FOREVER
+// ...
+long intervalsPassed = (nowMillis - startMillis) / interval;   // Division by zero!
+```
+
+**Root Cause:** `RecurrenceType.FOREVER.getMillis()` returns `0`, causing `interval` to be `0`. When the start date is in the past, the division `(nowMillis - startMillis) / interval` throws `ArithmeticException`.
+
+**Impact:** App crashes when viewing or processing a reminder with:
+- `RecurrenceType.FOREVER`
+- A start date in the past
+- The `ReminderTriggerWorker` background task will crash, preventing all reminders from firing.
+
+**Reproduction:**
+1. Create a reminder with FOREVER recurrence
+2. Set start date to the past
+3. App crashes when calculating next occurrence
+
+**Fix:** Handle FOREVER specially before the division:
+```java
+if (recurrenceType == RecurrenceType.FOREVER) {
+  // FOREVER means repeat indefinitely with some default interval (e.g., daily)
+  interval = RecurrenceType.DAY.getMillis() * recurrenceDelay;
+}
+```
+
+Or check for zero interval:
+```java
+if (interval <= 0) {
+  return startDateTime.after(now) ? (Calendar) startDateTime.clone() : null;
+}
+```
+
+**Discovered by:** Unit test `ReminderModelTest.getNextOccurrence_foreverRecurrence_withPastStart_throwsArithmeticException`
+
+---
+
+### 5. Wrong Next Occurrence Displayed in List
 **File:** `ReminderItemAdapter.java:62-63`
 
 **Description:** The adapter displays `startDateTime` instead of the actual next occurrence:
@@ -81,7 +122,7 @@ String nextOccurrenceStr = DateTimeDisplayUtil.getFriendlyDateTimeSingleLine(con
 
 ## Medium Bugs
 
-### 5. Potential NullPointerException in NotificationStarterService
+### 6. Potential NullPointerException in NotificationStarterService
 **File:** `NotificationStarterService.java:71`
 
 **Description:** The intent is accessed without null check:
@@ -103,7 +144,7 @@ if (intent == null) {
 
 ---
 
-### 6. NullPointerException in ReminderModel.equals()
+### 7. NullPointerException in ReminderModel.equals()
 **File:** `ReminderModel.java:177`
 
 **Description:** Inconsistent null handling in equals():
@@ -120,7 +161,7 @@ if (intent == null) {
 
 ---
 
-### 7. Vibration Pattern Doesn't Repeat
+### 8. Vibration Pattern Doesn't Repeat
 **File:** `NotificationStarterService.java:187`
 
 **Description:** Vibration only plays once:
@@ -134,7 +175,7 @@ vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
 
 ---
 
-### 8. Typo in RecurrenceType Enum
+### 9. Typo in RecurrenceType Enum
 **File:** `RecurrenceType.java:8`
 
 **Description:**
@@ -148,7 +189,7 @@ MONTH("Months(s)"),  // Should be "Month(s)"
 
 ---
 
-### 9. Inaccurate Month/Year Duration Calculations
+### 10. Inaccurate Month/Year Duration Calculations
 **File:** `RecurrenceType.java:47-48`
 
 **Description:** Fixed millisecond values for variable-length periods:
@@ -166,7 +207,7 @@ case YEAR -> 31_622_400_000L; // 366 days
 
 ---
 
-### 10. MaterialDatePicker Timezone Issue
+### 11. MaterialDatePicker Timezone Issue
 **File:** `UpsertReminderActivity.java:257-259`
 
 **Description:**
@@ -184,7 +225,7 @@ datePicker.addOnPositiveButtonClickListener(selection -> {
 
 ## Low Priority Issues
 
-### 11. Unnecessary endDateTime Initialization
+### 12. Unnecessary endDateTime Initialization
 **File:** `ReminderModel.java:42-43`
 
 **Description:** Default constructor initializes `endDateTime` to current time:
@@ -203,7 +244,7 @@ public ReminderModel() {
 
 ---
 
-### 12. Missing RECEIVE_BOOT_COMPLETED Permission
+### 13. Missing RECEIVE_BOOT_COMPLETED Permission
 **File:** `AndroidManifest.xml`
 
 **Description:** The BootReceiver is registered but the `RECEIVE_BOOT_COMPLETED` permission may not be declared.
@@ -214,7 +255,7 @@ public ReminderModel() {
 
 ---
 
-### 13. WorkManager Minimum Interval Warning
+### 14. WorkManager Minimum Interval Warning
 **File:** `ReminderApplication.java:38`
 
 **Description:**
@@ -232,8 +273,8 @@ new PeriodicWorkRequest.Builder(ReminderTriggerWorker.class, 1, TimeUnit.MINUTES
 
 | Severity | Count | Description |
 |----------|-------|-------------|
-| Critical | 4 | App crashes or core functionality broken |
-| Medium | 5 | Incorrect behavior or potential crashes |
+| Critical | 5 | App crashes or core functionality broken |
+| Medium | 6 | Incorrect behavior or potential crashes |
 | Low | 3 | Minor issues or code quality concerns |
 
-**Total bugs found: 13**
+**Total bugs found: 14**
