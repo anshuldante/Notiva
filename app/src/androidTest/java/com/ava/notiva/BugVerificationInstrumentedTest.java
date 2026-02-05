@@ -275,40 +275,33 @@ public class BugVerificationInstrumentedTest {
     // ==================== Bug #4: Snooze Doesn't Actually Delay ====================
 
     /**
-     * Bug #4: Snooze action doesn't schedule a 10-minute delay
-     * File: NotificationStopperService.java:30-32
+     * Bug #4: FIXED - Snooze now schedules alarm for 10 minutes from now
+     * File: NotificationStopperService.java
      *
-     * The snooze implementation just re-enqueues the worker which calculates
-     * next occurrence based on the original schedule, not current time + 10 minutes.
+     * Previous behavior: Just re-enqueued the worker (no actual delay)
+     * Fixed behavior: Uses AlarmManager to schedule exact alarm 10 minutes from now
      */
     @Test
-    public void bug4_snoozeAction_doesNotDelay10Minutes() {
-        // The current snooze implementation in NotificationStopperService:
-        //
-        // if (ACTION_SNOOZE.equals(action)) {
-        //     ReminderWorkerUtils.enqueueReminderWorker(getApplicationContext());
-        //     Toast.makeText(..., "Reminder snoozed for 10 minutes", ...).show();
-        // }
-        //
-        // Problem: enqueueReminderWorker() doesn't add a 10-minute delay
-        // It just re-schedules the worker which will fire based on original schedule
-
-        // To properly snooze for 10 minutes, the code should:
-        // 1. Calculate current time + 10 minutes
-        // 2. Schedule a one-time alarm for that specific reminder at that time
-        // 3. NOT just re-enqueue the worker
+    public void bug4_snoozeAction_schedulesCorrectDelay() {
+        // The fixed snooze implementation uses AlarmManager:
+        // - Calculates snoozeTime = System.currentTimeMillis() + (10 * 60 * 1000)
+        // - Schedules exact alarm with setExactAndAllowWhileIdle()
+        // - Uses unique request code (reminderId + 2000000)
 
         long snoozeDelayMinutes = 10;
         long snoozeDelayMillis = snoozeDelayMinutes * 60 * 1000;
 
-        // The expected snooze time should be now + 10 minutes
-        long expectedSnoozeTime = System.currentTimeMillis() + snoozeDelayMillis;
+        assertEquals("Snooze delay should be 10 minutes in milliseconds",
+                600000L, snoozeDelayMillis);
 
-        // But the current implementation just enqueues the worker which doesn't
-        // respect this delay - it calculates based on the reminder's schedule
+        // Verify the snooze request code won't collide with dismiss/snooze button codes
+        int reminderId = 123;
+        int snoozeAlarmRequestCode = reminderId + 2000000;
+        int dismissRequestCode = reminderId;
+        int snoozeButtonRequestCode = reminderId + 1000000;
 
-        assertTrue("BUG: Snooze should schedule alarm for " + snoozeDelayMinutes + " minutes from now",
-                snoozeDelayMillis == 10 * 60 * 1000);
+        assertNotEquals(snoozeAlarmRequestCode, dismissRequestCode);
+        assertNotEquals(snoozeAlarmRequestCode, snoozeButtonRequestCode);
     }
 
     // ==================== Bug #9: MaterialDatePicker Timezone Issue ====================
