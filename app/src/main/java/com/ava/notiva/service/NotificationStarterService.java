@@ -34,12 +34,21 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.ava.notiva.R;
+import com.ava.notiva.data.ReminderDao;
 
 import java.util.Date;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class NotificationStarterService extends Service {
 
   public static final String TAG = "Notiva.NotificationStarterService";
+
+  @Inject
+  ReminderDao reminderDao;
 
   private MediaPlayer mediaPlayer;
   private Vibrator vibrator;
@@ -68,10 +77,30 @@ public class NotificationStarterService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    // Guard against null intent (can happen on service restart by system)
+    if (intent == null) {
+      Log.w(TAG, "onStartCommand received null intent, stopping service");
+      stopSelf();
+      return START_NOT_STICKY;
+    }
+
     notificationId = intent.getIntExtra(REMINDER_ID, -1);
     notificationName = intent.getStringExtra(REMINDER_NAME);
     Log.i(TAG, "Inside onStartCommand, creating a notification for ID: " + notificationId);
     Log.i(TAG, "Starting alarm at: " + new Date());
+
+    // Clear snooze state since the alarm is now firing
+    if (notificationId != -1) {
+      new Thread(() -> {
+        try {
+          reminderDao.updateSnoozedUntil(notificationId, null);
+          Log.i(TAG, "Cleared snooze state for reminder " + notificationId);
+        } catch (Exception e) {
+          Log.e(TAG, "Failed to clear snooze state for reminder " + notificationId, e);
+        }
+      }).start();
+    }
+
     startForeground(notificationId, buildNotification());
 
     if (mediaPlayer == null) {
@@ -124,7 +153,7 @@ public class NotificationStarterService extends Service {
     dismissIntent.putExtra(REMINDER_ID, notificationId);
     dismissIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent dismissPendingIntent =
-        PendingIntent.getService(this, 0, dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+        PendingIntent.getService(this, notificationId, dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_cancel_24, getString(R.string.dismiss), dismissPendingIntent);
     builder.setContentIntent(dismissPendingIntent);
@@ -137,7 +166,7 @@ public class NotificationStarterService extends Service {
     snoozeIntent.putExtra(REMINDER_ID, notificationId);
     snoozeIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent snoozePendingIntent =
-        PendingIntent.getService(this, 0, snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+        PendingIntent.getService(this, notificationId + 1000000, snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_snooze_24, getString(R.string.snooze), snoozePendingIntent);
   }
@@ -184,7 +213,7 @@ public class NotificationStarterService extends Service {
   private void vibrateWithPattern() {
     if (vibrator != null && vibrator.hasVibrator()) {
       long[] pattern = {0, 500, 300, 500};
-      vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
+      vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0));  // 0 = repeat from beginning
     }
   }
 

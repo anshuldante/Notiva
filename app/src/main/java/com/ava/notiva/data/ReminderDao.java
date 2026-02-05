@@ -37,4 +37,7 @@ public interface ReminderDao {
 
   @Query("SELECT * FROM reminders where id = :id")
   LiveData<ReminderModel> get(int id);
+
+  @Query("UPDATE reminders SET snoozed_until = :snoozedUntil WHERE id = :id")
+  void updateSnoozedUntil(int id, Long snoozedUntil);
 }

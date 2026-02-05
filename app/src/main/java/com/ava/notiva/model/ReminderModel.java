@@ -36,10 +36,13 @@ public class ReminderModel {
   @ColumnInfo(name = "end_date")
   private Calendar endDateTime;
 
+  @ColumnInfo(name = "snoozed_until")
+  private Long snoozedUntil;  // Timestamp until which reminder is snoozed, null = not snoozed
+
   public ReminderModel() {
     this.active = true;
     this.recurrenceType = RecurrenceType.DAY;
-    this.endDateTime = Calendar.getInstance();
+    this.endDateTime = null;  // Only set when recurrence end is explicitly configured
     this.startDateTime = Calendar.getInstance();
   }
 
@@ -125,25 +128,56 @@ public class ReminderModel {
     this.endDateTime = endDateTime;
   }
 
+  public Long getSnoozedUntil() {
+    return snoozedUntil;
+  }
+
+  public void setSnoozedUntil(Long snoozedUntil) {
+    this.snoozedUntil = snoozedUntil;
+  }
+
+  public boolean isSnoozed() {
+    return snoozedUntil != null && snoozedUntil > System.currentTimeMillis();
+  }
+
   public Calendar getNextOccurrenceAfter(Calendar now) {
     if (startDateTime == null) {
       return null;
     }
-    if (recurrenceType == RecurrenceType.NEVER || recurrenceDelay <= 0) {
+    // NEVER/FOREVER have getMillis()=0, treat as one-time reminders
+    if (recurrenceType == RecurrenceType.NEVER || recurrenceType == RecurrenceType.FOREVER || recurrenceDelay <= 0) {
       return startDateTime.after(now) ? (Calendar) startDateTime.clone() : null;
     }
-    long startMillis = startDateTime.getTimeInMillis();
-    long nowMillis = now.getTimeInMillis();
-    long interval = recurrenceType.getMillis() * recurrenceDelay;
+
     Calendar next = (Calendar) startDateTime.clone();
     Calendar end = recurrenceType == RecurrenceType.FOREVER ? null : endDateTime;
-    if (startMillis > nowMillis) {
-      next.setTimeInMillis(startMillis);
+
+    // For MONTH/YEAR, use Calendar.add() to handle variable-length periods correctly
+    // For MINUTE/HOUR/DAY, use millisecond math (fixed-length periods)
+    if (recurrenceType == RecurrenceType.MONTH || recurrenceType == RecurrenceType.YEAR) {
+      int calendarField = recurrenceType == RecurrenceType.MONTH ? Calendar.MONTH : Calendar.YEAR;
+      // Iterate forward until we find the next occurrence after 'now'
+      while (!next.after(now)) {
+        next.add(calendarField, recurrenceDelay);
+        // Safety check to prevent infinite loop if end date is in the past
+        if (end != null && next.after(end)) {
+          return null;
+        }
+      }
     } else {
-      long intervalsPassed = (nowMillis - startMillis) / interval;
-      long nextMillis = startMillis + (intervalsPassed + 1) * interval;
-      next.setTimeInMillis(nextMillis);
+      // MINUTE, HOUR, DAY - use fixed millisecond intervals
+      long startMillis = startDateTime.getTimeInMillis();
+      long nowMillis = now.getTimeInMillis();
+      long interval = recurrenceType.getMillis() * recurrenceDelay;
+      if (startMillis > nowMillis) {
+        next.setTimeInMillis(startMillis);
+      } else {
+        long intervalsPassed = (nowMillis - startMillis) / interval;
+        long nextMillis = startMillis + (intervalsPassed + 1) * interval;
+        next.setTimeInMillis(nextMillis);
+      }
     }
+
     if (end != null && next.after(end)) {
       return null;
     }
@@ -161,6 +195,7 @@ public class ReminderModel {
         + ", recurrenceDelay=" + recurrenceDelay
         + ", recurrenceType=" + recurrenceType
         + ", endDateTime=" + (endDateTime != null ? endDateTime.getTime() : "null")
+        + ", snoozedUntil=" + snoozedUntil
         + '}';
   }
 
@@ -174,14 +209,15 @@ public class ReminderModel {
         && active == that.active
         && recurrenceDelay == that.recurrenceDelay
         && Objects.equals(name, that.name)
-        && startDateTime.equals(that.startDateTime)
+        && Objects.equals(startDateTime, that.startDateTime)
         && recurrenceType == that.recurrenceType
-        && Objects.equals(endDateTime, that.endDateTime);
+        && Objects.equals(endDateTime, that.endDateTime)
+        && Objects.equals(snoozedUntil, that.snoozedUntil);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        id, active, name, startDateTime, recurrenceDelay, recurrenceType, endDateTime);
+        id, active, name, startDateTime, recurrenceDelay, recurrenceType, endDateTime, snoozedUntil);
   }
 }

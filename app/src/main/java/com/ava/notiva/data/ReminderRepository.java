@@ -99,4 +99,21 @@ public class ReminderRepository {
   public List<ReminderModel> getAllSync() {
     return reminderDao.getAllSync();
   }
+
+  public void updateSnoozedUntil(int reminderId, Long snoozedUntil) {
+    reminderDaoExecutor.submit(
+        () -> {
+          try {
+            reminderDao.updateSnoozedUntil(reminderId, snoozedUntil);
+            Log.i(TAG, "Updated reminder " + reminderId + " snoozedUntil to: " + snoozedUntil);
+          } catch (Exception e) {
+            Log.e(TAG, "Exception while updating snoozedUntil for reminder: " + reminderId, e);
+          }
+        });
+  }
+
+  public void updateSnoozedUntilSync(int reminderId, Long snoozedUntil) {
+    reminderDao.updateSnoozedUntil(reminderId, snoozedUntil);
+    Log.i(TAG, "Updated reminder " + reminderId + " snoozedUntil to: " + snoozedUntil + " (sync)");
+  }
 }

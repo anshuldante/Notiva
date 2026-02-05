@@ -45,6 +45,10 @@ public class ReminderTriggerWorker extends Worker {
       AlarmManager alarmMgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
       for (ReminderModel reminder : reminders) {
         if (!reminder.isActive()) continue;
+        if (reminder.isSnoozed()) {
+          Log.i(TAG, "Skipping snoozed reminder: ID=" + reminder.getId() + ", snoozedUntil=" + reminder.getSnoozedUntil());
+          continue;
+        }
         Calendar next = reminder.getNextOccurrenceAfter(now);
         if (next != null && next.after(now)) {
           Intent alarmIntent = new Intent(getApplicationContext(), NotificationStarterService.class);
