@@ -77,6 +77,13 @@ public class NotificationStarterService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    // Guard against null intent (can happen on service restart by system)
+    if (intent == null) {
+      Log.w(TAG, "onStartCommand received null intent, stopping service");
+      stopSelf();
+      return START_NOT_STICKY;
+    }
+
     notificationId = intent.getIntExtra(REMINDER_ID, -1);
     notificationName = intent.getStringExtra(REMINDER_NAME);
     Log.i(TAG, "Inside onStartCommand, creating a notification for ID: " + notificationId);
@@ -206,7 +213,7 @@ public class NotificationStarterService extends Service {
   private void vibrateWithPattern() {
     if (vibrator != null && vibrator.hasVibrator()) {
       long[] pattern = {0, 500, 300, 500};
-      vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
+      vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0));  // 0 = repeat from beginning
     }
   }
 

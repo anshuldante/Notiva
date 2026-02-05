@@ -37,7 +37,7 @@ public class ReminderModelTest {
         assertTrue("Default active should be true", model.isActive());
         assertEquals("Default recurrence type should be DAY", RecurrenceType.DAY, model.getRecurrenceType());
         assertNotNull("Start date should not be null", model.getStartDateTime());
-        assertNotNull("End date should not be null", model.getEndDateTime());
+        assertNull("End date should be null by default", model.getEndDateTime());
     }
 
     @Test

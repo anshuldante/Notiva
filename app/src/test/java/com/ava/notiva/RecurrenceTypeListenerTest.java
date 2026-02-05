@@ -82,7 +82,7 @@ public class RecurrenceTypeListenerTest {
 
     @Test
     public void onItemSelected_month_updatesRecurrenceType() {
-        when(mockAdapterView.getItemAtPosition(3)).thenReturn("Months(s)");
+        when(mockAdapterView.getItemAtPosition(3)).thenReturn("Month(s)");
 
         listener.onItemSelected(mockAdapterView, mockView, 3, 3);
 

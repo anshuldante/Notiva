@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum RecurrenceType {
   YEAR("Year(s)"),
-  MONTH("Months(s)"),
+  MONTH("Month(s)"),
   DAY("Day(s)"),
   HOUR("Hour(s)"),
   MINUTE("Minute(s)"),

@@ -85,22 +85,22 @@ public class BugVerificationTest {
     // ==================== Bug #7: NPE in ReminderModel.equals() ====================
 
     /**
-     * Bug #7: ReminderModel.equals() throws NPE when startDateTime is null
+     * Bug #7: ReminderModel.equals() throws NPE when startDateTime is null - FIXED
      * File: ReminderModel.java:177
      *
-     * Current behavior: Throws NullPointerException
-     * Expected behavior: Should handle null startDateTime using Objects.equals()
+     * Previous behavior: Threw NullPointerException
+     * Fixed behavior: Handles null startDateTime using Objects.equals()
      */
-    @Test(expected = NullPointerException.class)
-    public void bug7_equals_nullStartDateTime_throwsNPE() {
+    @Test
+    public void bug7_equals_nullStartDateTime_handledCorrectly() {
         ReminderModel model1 = new ReminderModel();
         model1.setStartDateTime(null);
 
         ReminderModel model2 = new ReminderModel();
         model2.setStartDateTime(null);
 
-        // This throws NPE because equals() uses startDateTime.equals() instead of Objects.equals()
-        model1.equals(model2);
+        // FIXED: Now uses Objects.equals() so null values are handled correctly
+        assertTrue("equals() should handle null startDateTime", model1.equals(model2));
     }
 
     /**
@@ -215,19 +215,15 @@ public class BugVerificationTest {
     // ==================== Bug #13: Typo in RecurrenceType ====================
 
     /**
-     * Bug #13: MONTH has typo "Months(s)" instead of "Month(s)"
+     * Bug #13: MONTH has typo "Months(s)" instead of "Month(s)" - FIXED
      * File: RecurrenceType.java:8
      */
     @Test
-    public void bug13_monthTypo_showsMonthsWithExtraS() {
+    public void bug13_monthTypo_fixed() {
         String monthValue = RecurrenceType.MONTH.getValue();
 
-        // Current buggy value
-        assertEquals("MONTH has typo with extra 's'",
-                "Months(s)", monthValue);
-
-        // Should be "Month(s)" - this assertion documents expected fix
-        assertNotEquals("Should be 'Month(s)' after fix",
+        // FIXED: Now shows "Month(s)" correctly
+        assertEquals("MONTH should show 'Month(s)'",
                 "Month(s)", monthValue);
     }
 
@@ -247,18 +243,18 @@ public class BugVerificationTest {
     // ==================== Bug #14: Unnecessary endDateTime Initialization ====================
 
     /**
-     * Bug #14: Default constructor initializes endDateTime to current time
+     * Bug #14: Default constructor initializes endDateTime to current time - FIXED
      * File: ReminderModel.java:42-43
      *
-     * Current behavior: endDateTime is set to Calendar.getInstance()
-     * Problem: Non-recurring reminders don't need endDateTime, can cause confusion
+     * Previous behavior: endDateTime was set to Calendar.getInstance()
+     * Fixed behavior: endDateTime is null by default
      */
     @Test
-    public void bug14_defaultConstructor_initializesEndDateTime() {
+    public void bug14_defaultConstructor_endDateTimeIsNull() {
         ReminderModel reminder = new ReminderModel();
 
-        // endDateTime is unnecessarily initialized
-        assertNotNull("endDateTime should be null for new reminders but isn't",
+        // FIXED: endDateTime is now null by default
+        assertNull("endDateTime should be null for new reminders",
                 reminder.getEndDateTime());
     }
 

@@ -58,7 +58,7 @@ public class RecurrenceTypeTest {
     @Test
     public void getValue_allTypes_returnCorrectDisplayStrings() {
         assertEquals("Year(s)", RecurrenceType.YEAR.getValue());
-        assertEquals("Months(s)", RecurrenceType.MONTH.getValue());
+        assertEquals("Month(s)", RecurrenceType.MONTH.getValue());
         assertEquals("Day(s)", RecurrenceType.DAY.getValue());
         assertEquals("Hour(s)", RecurrenceType.HOUR.getValue());
         assertEquals("Minute(s)", RecurrenceType.MINUTE.getValue());
@@ -71,7 +71,7 @@ public class RecurrenceTypeTest {
     @Test
     public void getRecurrenceTypeByValue_validValues_returnsCorrectEnum() {
         assertEquals(RecurrenceType.YEAR, RecurrenceType.getRecurrenceTypeByValue("Year(s)"));
-        assertEquals(RecurrenceType.MONTH, RecurrenceType.getRecurrenceTypeByValue("Months(s)"));
+        assertEquals(RecurrenceType.MONTH, RecurrenceType.getRecurrenceTypeByValue("Month(s)"));
         assertEquals(RecurrenceType.DAY, RecurrenceType.getRecurrenceTypeByValue("Day(s)"));
         assertEquals(RecurrenceType.HOUR, RecurrenceType.getRecurrenceTypeByValue("Hour(s)"));
         assertEquals(RecurrenceType.MINUTE, RecurrenceType.getRecurrenceTypeByValue("Minute(s)"));

@@ -42,7 +42,7 @@ public class ReminderModel {
   public ReminderModel() {
     this.active = true;
     this.recurrenceType = RecurrenceType.DAY;
-    this.endDateTime = Calendar.getInstance();
+    this.endDateTime = null;  // Only set when recurrence end is explicitly configured
     this.startDateTime = Calendar.getInstance();
   }
 
@@ -191,7 +191,7 @@ public class ReminderModel {
         && active == that.active
         && recurrenceDelay == that.recurrenceDelay
         && Objects.equals(name, that.name)
-        && startDateTime.equals(that.startDateTime)
+        && Objects.equals(startDateTime, that.startDateTime)
         && recurrenceType == that.recurrenceType
         && Objects.equals(endDateTime, that.endDateTime)
         && Objects.equals(snoozedUntil, that.snoozedUntil);
