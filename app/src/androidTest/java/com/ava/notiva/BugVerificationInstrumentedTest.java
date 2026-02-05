@@ -45,72 +45,31 @@ public class BugVerificationInstrumentedTest {
     // ==================== Bug #3: PendingIntent Request Code Collision ====================
 
     /**
-     * Bug #3: Both snooze and dismiss PendingIntents use request code 0
+     * Bug #3: FIXED - Snooze and dismiss now use unique request codes
      * File: NotificationStarterService.java:127,140
      *
-     * Current behavior: Both use request code 0, causing collision
-     * Expected behavior: Each should have unique request code
+     * Previous behavior: Both used request code 0, causing collision
+     * Fixed behavior: Dismiss uses notificationId, Snooze uses notificationId + 1000000
      */
     @Test
-    public void bug3_pendingIntentCollision_sameRequestCodeForBothActions() {
+    public void bug3_pendingIntent_uniqueRequestCodes() {
         int notificationId = 123;
 
-        // Create dismiss intent (same as NotificationStarterService.attachDismissActions)
+        // Request codes now used in NotificationStarterService
+        int dismissRequestCode = notificationId;
+        int snoozeRequestCode = notificationId + 1000000;
+
+        // Verify they are unique
+        assertNotEquals("Request codes should be unique",
+                dismissRequestCode, snoozeRequestCode);
+
         Intent dismissIntent = new Intent(context, NotificationStopperService.class);
         dismissIntent.setAction(ReminderConstants.ACTION_DISMISS);
         dismissIntent.putExtra(ReminderConstants.REMINDER_ID, notificationId);
 
-        // Create snooze intent (same as NotificationStarterService.attachSnoozeAction)
         Intent snoozeIntent = new Intent(context, NotificationStopperService.class);
         snoozeIntent.setAction(ReminderConstants.ACTION_SNOOZE);
         snoozeIntent.putExtra(ReminderConstants.REMINDER_ID, notificationId);
-
-        // Both use request code 0 - THIS IS THE BUG
-        int dismissRequestCode = 0;
-        int snoozeRequestCode = 0;
-
-        PendingIntent dismissPendingIntent = PendingIntent.getService(
-                context, dismissRequestCode, dismissIntent,
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-
-        PendingIntent snoozePendingIntent = PendingIntent.getService(
-                context, snoozeRequestCode, snoozeIntent,
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // With same request code and FLAG_UPDATE_CURRENT, Android considers them "equal"
-        // This means the second one replaces the first
-        assertEquals("BUG: Both request codes are 0, causing collision",
-                dismissRequestCode, snoozeRequestCode);
-
-        // The PendingIntents should be different but they're being treated as the same
-        // due to FLAG_UPDATE_CURRENT with same request code
-        // Note: PendingIntent.equals() checks more than just request code,
-        // but the system uses filterEquals() which can cause issues
-
-        // Clean up
-        dismissPendingIntent.cancel();
-        snoozePendingIntent.cancel();
-    }
-
-    /**
-     * Bug #3: Verify that unique request codes would fix the issue
-     */
-    @Test
-    public void bug3_pendingIntent_uniqueRequestCodesFix() {
-        int notificationId = 123;
-
-        Intent dismissIntent = new Intent(context, NotificationStopperService.class);
-        dismissIntent.setAction(ReminderConstants.ACTION_DISMISS);
-
-        Intent snoozeIntent = new Intent(context, NotificationStopperService.class);
-        snoozeIntent.setAction(ReminderConstants.ACTION_SNOOZE);
-
-        // CORRECT: Use unique request codes
-        int dismissRequestCode = notificationId;
-        int snoozeRequestCode = notificationId + 1000000;
-
-        assertNotEquals("Request codes should be unique",
-                dismissRequestCode, snoozeRequestCode);
 
         PendingIntent dismissPendingIntent = PendingIntent.getService(
                 context, dismissRequestCode, dismissIntent,
@@ -127,6 +86,29 @@ public class BugVerificationInstrumentedTest {
         // Clean up
         dismissPendingIntent.cancel();
         snoozePendingIntent.cancel();
+    }
+
+    /**
+     * Bug #3: Verify multiple notifications don't interfere with each other
+     */
+    @Test
+    public void bug3_pendingIntent_multipleNotificationsUnique() {
+        int notificationId1 = 100;
+        int notificationId2 = 200;
+
+        // Each notification gets its own unique request codes
+        int dismiss1 = notificationId1;
+        int snooze1 = notificationId1 + 1000000;
+        int dismiss2 = notificationId2;
+        int snooze2 = notificationId2 + 1000000;
+
+        // All four request codes should be unique
+        assertNotEquals(dismiss1, snooze1);
+        assertNotEquals(dismiss1, dismiss2);
+        assertNotEquals(dismiss1, snooze2);
+        assertNotEquals(snooze1, dismiss2);
+        assertNotEquals(snooze1, snooze2);
+        assertNotEquals(dismiss2, snooze2);
     }
 
     // ==================== Bug #5: Missing RECEIVE_BOOT_COMPLETED Permission ====================

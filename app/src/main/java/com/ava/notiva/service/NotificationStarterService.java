@@ -124,7 +124,7 @@ public class NotificationStarterService extends Service {
     dismissIntent.putExtra(REMINDER_ID, notificationId);
     dismissIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent dismissPendingIntent =
-        PendingIntent.getService(this, 0, dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+        PendingIntent.getService(this, notificationId, dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_cancel_24, getString(R.string.dismiss), dismissPendingIntent);
     builder.setContentIntent(dismissPendingIntent);
@@ -137,7 +137,7 @@ public class NotificationStarterService extends Service {
     snoozeIntent.putExtra(REMINDER_ID, notificationId);
     snoozeIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent snoozePendingIntent =
-        PendingIntent.getService(this, 0, snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+        PendingIntent.getService(this, notificationId + 1000000, snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_snooze_24, getString(R.string.snooze), snoozePendingIntent);
   }
