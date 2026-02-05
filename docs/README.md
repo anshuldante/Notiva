@@ -52,7 +52,7 @@ cd my-reminder-app
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Available | App architecture and patterns |
 | [DATABASE.md](DATABASE.md) | Available | Room schema and migrations |
 | [TESTING.md](TESTING.md) | Available | Testing strategy and guides |
-| [UI.md](UI.md) | Planned | UI components and navigation |
+| [UI.md](UI.md) | Available | UI components and navigation |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Planned | Contribution guidelines |
 | [features/REMINDERS.md](features/REMINDERS.md) | Available | Reminder CRUD operations |
 | [features/NOTIFICATIONS.md](features/NOTIFICATIONS.md) | Available | Notification system |
@@ -106,4 +106,4 @@ my-reminder-app/
 
 ---
 
-*Documentation last updated: 2026-02-05 - Added Recurrence and Constraints documentation*
+*Documentation last updated: 2026-02-05 - Added UI documentation*
