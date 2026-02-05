@@ -51,7 +51,7 @@ cd my-reminder-app
 | [SETUP.md](SETUP.md) | Available | Development environment setup |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Available | App architecture and patterns |
 | [DATABASE.md](DATABASE.md) | Available | Room schema and migrations |
-| [TESTING.md](TESTING.md) | Planned | Testing strategy and guides |
+| [TESTING.md](TESTING.md) | Available | Testing strategy and guides |
 | [UI.md](UI.md) | Planned | UI components and navigation |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Planned | Contribution guidelines |
 | [features/REMINDERS.md](features/REMINDERS.md) | Planned | Reminder CRUD operations |
@@ -106,4 +106,4 @@ my-reminder-app/
 
 ---
 
-*Documentation last updated: 2026-02-05*
+*Documentation last updated: 2026-02-05 - Added Testing Guide*
