@@ -103,4 +103,4 @@ lint/tmp/
 # lint/reports/
 
 # Android Profiling
-*.hprof
+*.hprof.planning/
