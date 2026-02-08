@@ -39,6 +39,15 @@ public class ReminderModel {
   @ColumnInfo(name = "snoozed_until")
   private Long snoozedUntil;  // Timestamp until which reminder is snoozed, null = not snoozed
 
+  @ColumnInfo(name = "last_fired_at")
+  private Long lastFiredAt;  // Epoch millis when reminder last fired, null = never fired
+
+  @ColumnInfo(name = "last_acknowledged_at")
+  private Long lastAcknowledgedAt;  // Epoch millis when user last dismissed/snoozed, null = never acknowledged
+
+  @ColumnInfo(name = "ringtone_uri")
+  private String ringtoneUri;  // Per-reminder ringtone override, null = use global default
+
   public ReminderModel() {
     this.active = true;
     this.recurrenceType = RecurrenceType.DAY;
@@ -140,6 +149,30 @@ public class ReminderModel {
     return snoozedUntil != null && snoozedUntil > System.currentTimeMillis();
   }
 
+  public Long getLastFiredAt() {
+    return lastFiredAt;
+  }
+
+  public void setLastFiredAt(Long lastFiredAt) {
+    this.lastFiredAt = lastFiredAt;
+  }
+
+  public Long getLastAcknowledgedAt() {
+    return lastAcknowledgedAt;
+  }
+
+  public void setLastAcknowledgedAt(Long lastAcknowledgedAt) {
+    this.lastAcknowledgedAt = lastAcknowledgedAt;
+  }
+
+  public String getRingtoneUri() {
+    return ringtoneUri;
+  }
+
+  public void setRingtoneUri(String ringtoneUri) {
+    this.ringtoneUri = ringtoneUri;
+  }
+
   public Calendar getNextOccurrenceAfter(Calendar now) {
     if (startDateTime == null) {
       return null;
@@ -196,6 +229,9 @@ public class ReminderModel {
         + ", recurrenceType=" + recurrenceType
         + ", endDateTime=" + (endDateTime != null ? endDateTime.getTime() : "null")
         + ", snoozedUntil=" + snoozedUntil
+        + ", lastFiredAt=" + lastFiredAt
+        + ", lastAcknowledgedAt=" + lastAcknowledgedAt
+        + ", ringtoneUri='" + ringtoneUri + '\''
         + '}';
   }
 
@@ -212,12 +248,16 @@ public class ReminderModel {
         && Objects.equals(startDateTime, that.startDateTime)
         && recurrenceType == that.recurrenceType
         && Objects.equals(endDateTime, that.endDateTime)
-        && Objects.equals(snoozedUntil, that.snoozedUntil);
+        && Objects.equals(snoozedUntil, that.snoozedUntil)
+        && Objects.equals(lastFiredAt, that.lastFiredAt)
+        && Objects.equals(lastAcknowledgedAt, that.lastAcknowledgedAt)
+        && Objects.equals(ringtoneUri, that.ringtoneUri);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        id, active, name, startDateTime, recurrenceDelay, recurrenceType, endDateTime, snoozedUntil);
+        id, active, name, startDateTime, recurrenceDelay, recurrenceType, endDateTime,
+        snoozedUntil, lastFiredAt, lastAcknowledgedAt, ringtoneUri);
   }
 }
