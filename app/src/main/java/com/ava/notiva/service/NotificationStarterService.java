@@ -35,6 +35,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.ava.notiva.R;
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.PendingIntentRequestCodes;
 
 import java.util.Date;
 
@@ -95,8 +96,10 @@ public class NotificationStarterService extends Service {
         try {
           reminderDao.updateSnoozedUntil(notificationId, null);
           Log.i(TAG, "Cleared snooze state for reminder " + notificationId);
+          reminderDao.updateLastFiredAt(notificationId, System.currentTimeMillis());
+          Log.i(TAG, "Updated last_fired_at for reminder " + notificationId);
         } catch (Exception e) {
-          Log.e(TAG, "Failed to clear snooze state for reminder " + notificationId, e);
+          Log.e(TAG, "Failed to update state for reminder " + notificationId, e);
         }
       }).start();
     }
@@ -153,7 +156,7 @@ public class NotificationStarterService extends Service {
     dismissIntent.putExtra(REMINDER_ID, notificationId);
     dismissIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent dismissPendingIntent =
-        PendingIntent.getService(this, notificationId, dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+        PendingIntent.getService(this, PendingIntentRequestCodes.forDismiss(notificationId), dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_cancel_24, getString(R.string.dismiss), dismissPendingIntent);
     builder.setContentIntent(dismissPendingIntent);
@@ -166,7 +169,7 @@ public class NotificationStarterService extends Service {
     snoozeIntent.putExtra(REMINDER_ID, notificationId);
     snoozeIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent snoozePendingIntent =
-        PendingIntent.getService(this, notificationId + 1000000, snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+        PendingIntent.getService(this, PendingIntentRequestCodes.forSnooze(notificationId), snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_snooze_24, getString(R.string.snooze), snoozePendingIntent);
   }

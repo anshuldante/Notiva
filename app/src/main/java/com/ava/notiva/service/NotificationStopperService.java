@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.PendingIntentRequestCodes;
 
 import javax.inject.Inject;
 
@@ -40,6 +41,19 @@ public class NotificationStopperService extends Service {
     Log.i(TAG, "Action received: " + action);
     Intent intentService = new Intent(getApplicationContext(), NotificationStarterService.class);
     getApplicationContext().stopService(intentService);
+
+    // Update last_acknowledged_at for both dismiss and snooze actions
+    int reminderId = intent != null ? intent.getIntExtra(REMINDER_ID, -1) : -1;
+    if (reminderId != -1) {
+      new Thread(() -> {
+        try {
+          reminderDao.updateLastAcknowledgedAt(reminderId, System.currentTimeMillis());
+          Log.i(TAG, "Updated last_acknowledged_at for reminder " + reminderId);
+        } catch (Exception e) {
+          Log.e(TAG, "Failed to update last_acknowledged_at for reminder " + reminderId, e);
+        }
+      }).start();
+    }
 
     if (ACTION_SNOOZE.equals(action)) {
       scheduleSnoozeAlarm(intent);
@@ -76,9 +90,8 @@ public class NotificationStopperService extends Service {
     alarmIntent.putExtra(REMINDER_ID, reminderId);
     alarmIntent.putExtra(REMINDER_NAME, reminderName);
 
-    // Use unique request code (reminderId + 2000000) to avoid conflicts with dismiss/snooze PendingIntents
     PendingIntent pendingIntent = PendingIntent.getService(
-        this, reminderId + 2000000, alarmIntent,
+        this, PendingIntentRequestCodes.forSnoozeAlarm(reminderId), alarmIntent,
         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent);

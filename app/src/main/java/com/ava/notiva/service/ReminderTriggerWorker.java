@@ -16,6 +16,7 @@ import androidx.work.WorkerParameters;
 
 import com.ava.notiva.data.ReminderRepository;
 import com.ava.notiva.model.ReminderModel;
+import com.ava.notiva.util.PendingIntentRequestCodes;
 
 import java.util.Calendar;
 import java.util.List;
@@ -55,7 +56,7 @@ public class ReminderTriggerWorker extends Worker {
           alarmIntent.putExtra(REMINDER_ID, reminder.getId());
           alarmIntent.putExtra(REMINDER_NAME, reminder.getName());
           PendingIntent pendingIntent = PendingIntent.getService(
-              getApplicationContext(), reminder.getId(), alarmIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+              getApplicationContext(), PendingIntentRequestCodes.forAlarm(reminder.getId()), alarmIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
           alarmMgr.setExactAndAllowWhileIdle(
               AlarmManager.RTC_WAKEUP,
               next.getTimeInMillis(),
