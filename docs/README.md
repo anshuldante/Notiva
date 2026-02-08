@@ -22,7 +22,7 @@ For complete environment setup, see the [Setup Guide](SETUP.md).
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd my-reminder-app
+cd Notiva
 
 # Open in Android Studio and sync Gradle
 # Build and run on emulator or device
@@ -85,7 +85,7 @@ cd my-reminder-app
 ## Directory Structure
 
 ```
-my-reminder-app/
+Notiva/
 ├── app/
 │   └── src/main/java/com/ava/notiva/
 │       ├── activities/          # Activity classes

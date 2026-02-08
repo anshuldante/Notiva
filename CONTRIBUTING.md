@@ -27,11 +27,11 @@ Before contributing, set up your development environment:
 3. **Fork and Clone**:
    ```bash
    # Fork the repository on GitHub, then clone your fork
-   git clone https://github.com/YOUR-USERNAME/my-reminder-app.git
-   cd my-reminder-app
+   git clone https://github.com/YOUR-USERNAME/Notiva.git
+   cd Notiva
 
    # Add the upstream remote
-   git remote add upstream https://github.com/ORIGINAL-OWNER/my-reminder-app.git
+   git remote add upstream https://github.com/ORIGINAL-OWNER/Notiva.git
    ```
 
 4. **Build the Project**:

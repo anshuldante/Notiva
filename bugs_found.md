@@ -230,10 +230,10 @@ new PeriodicWorkRequest.Builder(ReminderTriggerWorker.class, 1, TimeUnit.MINUTES
 
 ## Summary
 
-| Severity | Count | Description |
-|----------|-------|-------------|
-| Critical | 4 | App crashes or core functionality broken |
-| Medium | 5 | Incorrect behavior or potential crashes |
-| Low | 3 | Minor issues or code quality concerns |
+| Severity | Count | Description                              |
+| -------- | ----- | ---------------------------------------- |
+| Critical | 4     | App crashes or core functionality broken |
+| Medium   | 5     | Incorrect behavior or potential crashes  |
+| Low      | 3     | Minor issues or code quality concerns    |
 
 **Total bugs found: 13**
