@@ -71,14 +71,14 @@ Verify your environment before proceeding:
 git clone <repository-url>
 
 # Navigate to the project directory
-cd my-reminder-app
+cd Notiva
 ```
 
 ### Step 2: Open in Android Studio
 
 1. Launch **Android Studio**
 2. Select **"Open"** (or **File** > **Open** if already in Android Studio)
-3. Navigate to and select the `my-reminder-app` directory
+3. Navigate to and select the `Notiva` directory
 4. Click **OK** to open the project
 
 ### Step 3: Wait for Gradle Sync
