@@ -116,4 +116,38 @@ public class ReminderRepository {
     reminderDao.updateSnoozedUntil(reminderId, snoozedUntil);
     Log.i(TAG, "Updated reminder " + reminderId + " snoozedUntil to: " + snoozedUntil + " (sync)");
   }
+
+  public void updateLastFiredAt(int reminderId, Long lastFiredAt) {
+    reminderDaoExecutor.submit(
+        () -> {
+          try {
+            reminderDao.updateLastFiredAt(reminderId, lastFiredAt);
+            Log.i(TAG, "Updated reminder " + reminderId + " lastFiredAt to: " + lastFiredAt);
+          } catch (Exception e) {
+            Log.e(TAG, "Exception while updating lastFiredAt for reminder: " + reminderId, e);
+          }
+        });
+  }
+
+  public void updateLastFiredAtSync(int reminderId, Long lastFiredAt) {
+    reminderDao.updateLastFiredAt(reminderId, lastFiredAt);
+    Log.i(TAG, "Updated reminder " + reminderId + " lastFiredAt to: " + lastFiredAt + " (sync)");
+  }
+
+  public void updateLastAcknowledgedAt(int reminderId, Long lastAcknowledgedAt) {
+    reminderDaoExecutor.submit(
+        () -> {
+          try {
+            reminderDao.updateLastAcknowledgedAt(reminderId, lastAcknowledgedAt);
+            Log.i(TAG, "Updated reminder " + reminderId + " lastAcknowledgedAt to: " + lastAcknowledgedAt);
+          } catch (Exception e) {
+            Log.e(TAG, "Exception while updating lastAcknowledgedAt for reminder: " + reminderId, e);
+          }
+        });
+  }
+
+  public void updateLastAcknowledgedAtSync(int reminderId, Long lastAcknowledgedAt) {
+    reminderDao.updateLastAcknowledgedAt(reminderId, lastAcknowledgedAt);
+    Log.i(TAG, "Updated reminder " + reminderId + " lastAcknowledgedAt to: " + lastAcknowledgedAt + " (sync)");
+  }
 }
