@@ -83,4 +83,8 @@
     <string name="no_end_time">No end time</string>
     <string name="no_end_date">No end date</string>
 
+    <!--  Strings for Settings  -->
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
 </resources>
