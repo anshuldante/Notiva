@@ -9,8 +9,10 @@ import static com.ava.notiva.util.ReminderConstants.CHANNEL_ID;
 import static com.ava.notiva.util.ReminderConstants.CHANNEL_NAME;
 import static com.ava.notiva.util.ReminderConstants.FOREGROUND_CHANNEL_ID;
 import static com.ava.notiva.util.ReminderConstants.FOREGROUND_CHANNEL_NAME;
+import static com.ava.notiva.util.ReminderConstants.NOTIFICATION_GROUP_KEY;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_ID;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_NAME;
+import static com.ava.notiva.util.ReminderConstants.SCHEDULED_FIRE_EPOCH;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -33,6 +35,8 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.ava.notiva.R;
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.NotificationGroupManager;
+import com.ava.notiva.util.NotificationIdGenerator;
 import com.ava.notiva.util.NotificationPreferences;
 import com.ava.notiva.util.PendingIntentRequestCodes;
 
@@ -95,21 +99,24 @@ public class NotificationStarterService extends Service {
       return START_NOT_STICKY;
     }
 
-    int notificationId = intent.getIntExtra(REMINDER_ID, -1);
+    int reminderId = intent.getIntExtra(REMINDER_ID, -1);
     String notificationName = intent.getStringExtra(REMINDER_NAME);
-    Log.i(TAG, "Inside onStartCommand, creating a notification for ID: " + notificationId);
+    long scheduledFireEpoch = intent.getLongExtra(SCHEDULED_FIRE_EPOCH, System.currentTimeMillis());
+    int notificationId = NotificationIdGenerator.generate(reminderId, scheduledFireEpoch);
+    Log.i(TAG, "Inside onStartCommand, reminderId=" + reminderId
+        + ", notificationId=" + notificationId + ", scheduledFireEpoch=" + scheduledFireEpoch);
     Log.i(TAG, "Starting alarm at: " + new Date());
 
     // Clear snooze state and update last_fired_at
-    if (notificationId != -1) {
+    if (reminderId != -1) {
       new Thread(() -> {
         try {
-          reminderDao.updateSnoozedUntil(notificationId, null);
-          Log.i(TAG, "Cleared snooze state for reminder " + notificationId);
-          reminderDao.updateLastFiredAt(notificationId, System.currentTimeMillis());
-          Log.i(TAG, "Updated last_fired_at for reminder " + notificationId);
+          reminderDao.updateSnoozedUntil(reminderId, null);
+          Log.i(TAG, "Cleared snooze state for reminder " + reminderId);
+          reminderDao.updateLastFiredAt(reminderId, System.currentTimeMillis());
+          Log.i(TAG, "Updated last_fired_at for reminder " + reminderId);
         } catch (Exception e) {
-          Log.e(TAG, "Failed to update state for reminder " + notificationId, e);
+          Log.e(TAG, "Failed to update state for reminder " + reminderId, e);
         }
       }).start();
     }
@@ -129,8 +136,12 @@ public class NotificationStarterService extends Service {
     }
 
     // Step 3: Build and post the reminder notification
-    Notification notification = buildAlarmNotification(channelId, notificationId, notificationName);
+    Notification notification = buildAlarmNotification(channelId, reminderId, notificationId, notificationName);
     notificationManager.notify(notificationId, notification);
+
+    // Step 4: Update summary and apply collapse logic
+    NotificationManager platformManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationGroupManager.updateSummaryAndCollapse(this, platformManager);
 
     // Reset the 5-minute self-stop timer
     resetSelfStopTimeout();
@@ -222,42 +233,45 @@ public class NotificationStarterService extends Service {
   // Alarm notification building
   // -------------------------------------------------------------------------
 
-  private Notification buildAlarmNotification(String channelId, int notificationId, String notificationName) {
+  private Notification buildAlarmNotification(String channelId, int reminderId, int notificationId, String notificationName) {
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
         .setSmallIcon(R.drawable.ic_alarm)
-        .setContentText(buildReminderText(notificationId, notificationName))
+        .setContentText(buildReminderText(reminderId, notificationName))
         .setContentTitle(notificationName)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setTicker(getText(R.string.ticker_text))
-        .setAutoCancel(true);
+        .setAutoCancel(true)
+        .setGroup(NOTIFICATION_GROUP_KEY);
 
-    attachSnoozeAction(builder, notificationId, notificationName);
-    attachDismissAction(builder, notificationId, notificationName);
+    attachSnoozeAction(builder, reminderId, notificationId, notificationName);
+    attachDismissAction(builder, reminderId, notificationId, notificationName);
 
-    Log.i(TAG, "Notification Built for ID: " + notificationId);
+    Log.i(TAG, "Notification Built for reminderId=" + reminderId + ", notificationId=" + notificationId);
     return builder.build();
   }
 
-  private void attachDismissAction(NotificationCompat.Builder builder, int notificationId, String notificationName) {
+  private void attachDismissAction(NotificationCompat.Builder builder, int reminderId, int notificationId, String notificationName) {
     Intent dismissIntent = new Intent(this, NotificationStopperService.class);
     dismissIntent.setAction(ACTION_DISMISS);
     dismissIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
-    dismissIntent.putExtra(REMINDER_ID, notificationId);
+    dismissIntent.putExtra(REMINDER_ID, reminderId);
     dismissIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent dismissPendingIntent =
         PendingIntent.getService(this, PendingIntentRequestCodes.forDismiss(notificationId), dismissIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
     builder.addAction(
         R.drawable.ic_baseline_cancel_24, getString(R.string.dismiss), dismissPendingIntent);
     builder.setContentIntent(dismissPendingIntent);
+    // Swipe-dismiss also triggers NotificationStopperService to update last_acknowledged_at
+    builder.setDeleteIntent(dismissPendingIntent);
   }
 
-  private void attachSnoozeAction(NotificationCompat.Builder builder, int notificationId, String notificationName) {
+  private void attachSnoozeAction(NotificationCompat.Builder builder, int reminderId, int notificationId, String notificationName) {
     Intent snoozeIntent = new Intent(this, NotificationStopperService.class);
     snoozeIntent.setAction(ACTION_SNOOZE);
     snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
-    snoozeIntent.putExtra(REMINDER_ID, notificationId);
+    snoozeIntent.putExtra(REMINDER_ID, reminderId);
     snoozeIntent.putExtra(REMINDER_NAME, notificationName);
     PendingIntent snoozePendingIntent =
         PendingIntent.getService(this, PendingIntentRequestCodes.forSnooze(notificationId), snoozeIntent, FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
@@ -266,11 +280,11 @@ public class NotificationStarterService extends Service {
   }
 
   @NonNull
-  private String buildReminderText(int notificationId, String notificationName) {
+  private String buildReminderText(int reminderId, String notificationName) {
     StringBuilder contentTextBuilder = new StringBuilder();
     contentTextBuilder.append("Ring Ring...Ring Ring");
-    if (notificationId != -1) {
-      contentTextBuilder.append(" | ID: ").append(notificationId);
+    if (reminderId != -1) {
+      contentTextBuilder.append(" | ID: ").append(reminderId);
     } else {
       Log.i(TAG, "Reminder ID was -1");
     }
