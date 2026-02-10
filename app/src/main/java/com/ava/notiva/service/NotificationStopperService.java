@@ -13,7 +13,10 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationManagerCompat;
+
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.NotificationPreferences;
 import com.ava.notiva.util.PendingIntentRequestCodes;
 
 import javax.inject.Inject;
@@ -39,12 +42,13 @@ public class NotificationStopperService extends Service {
     Log.i(TAG, "NotificationStopperService starting up");
     String action = intent != null ? intent.getAction() : null;
     Log.i(TAG, "Action received: " + action);
-    Intent intentService = new Intent(getApplicationContext(), NotificationStarterService.class);
-    getApplicationContext().stopService(intentService);
 
-    // Update last_acknowledged_at for both dismiss and snooze actions
+    // Cancel only this reminder's notification, not the entire foreground service
     int reminderId = intent != null ? intent.getIntExtra(REMINDER_ID, -1) : -1;
     if (reminderId != -1) {
+      NotificationManagerCompat.from(this).cancel(reminderId);
+      Log.i(TAG, "Cancelled notification for reminder " + reminderId);
+
       new Thread(() -> {
         try {
           reminderDao.updateLastAcknowledgedAt(reminderId, System.currentTimeMillis());
@@ -57,9 +61,14 @@ public class NotificationStopperService extends Service {
 
     if (ACTION_SNOOZE.equals(action)) {
       scheduleSnoozeAlarm(intent);
-      Toast.makeText(getApplicationContext(), "Reminder snoozed for 10 minutes", Toast.LENGTH_SHORT).show();
+      int snoozeDuration = NotificationPreferences.getSnoozeDurationMinutes(this);
+      Toast.makeText(getApplicationContext(),
+          "Reminder snoozed for " + snoozeDuration + " minutes",
+          Toast.LENGTH_SHORT).show();
     }
-    return super.onStartCommand(intent, flags, startId);
+
+    stopSelf();
+    return START_NOT_STICKY;
   }
 
   private void scheduleSnoozeAlarm(Intent intent) {
@@ -71,8 +80,9 @@ public class NotificationStopperService extends Service {
       return;
     }
 
-    // Schedule alarm for 10 minutes from now
-    long snoozeDelayMillis = 10 * 60 * 1000L;
+    // Schedule alarm using preference-driven snooze duration
+    int snoozeDurationMinutes = NotificationPreferences.getSnoozeDurationMinutes(this);
+    long snoozeDelayMillis = snoozeDurationMinutes * 60 * 1000L;
     long snoozeTime = System.currentTimeMillis() + snoozeDelayMillis;
 
     // Mark reminder as snoozed in database so regular scheduling skips it
@@ -95,6 +105,6 @@ public class NotificationStopperService extends Service {
         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent);
-    Log.i(TAG, "Snoozed reminder " + reminderId + " for 10 minutes");
+    Log.i(TAG, "Snoozed reminder " + reminderId + " for " + snoozeDurationMinutes + " minutes");
   }
 }
