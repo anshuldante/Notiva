@@ -40,4 +40,10 @@ public interface ReminderDao {
 
   @Query("UPDATE reminders SET snoozed_until = :snoozedUntil WHERE id = :id")
   void updateSnoozedUntil(int id, Long snoozedUntil);
+
+  @Query("UPDATE reminders SET last_fired_at = :lastFiredAt WHERE id = :id")
+  void updateLastFiredAt(int id, Long lastFiredAt);
+
+  @Query("UPDATE reminders SET last_acknowledged_at = :lastAcknowledgedAt WHERE id = :id")
+  void updateLastAcknowledgedAt(int id, Long lastAcknowledgedAt);
 }

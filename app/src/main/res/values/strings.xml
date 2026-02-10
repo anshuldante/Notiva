@@ -83,4 +83,16 @@
     <string name="no_end_time">No end time</string>
     <string name="no_end_date">No end date</string>
 
+    <!--  Strings for Settings  -->
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_category_notifications">Notifications</string>
+    <string name="pref_ringtone_title">Default ringtone</string>
+    <string name="pref_ringtone_summary_silent">Silent</string>
+    <string name="pref_vibration_title">Vibration</string>
+    <string name="pref_vibration_summary_on">Vibrate when notification fires</string>
+    <string name="pref_vibration_summary_off">No vibration</string>
+    <string name="pref_snooze_duration_title">Snooze duration</string>
+    <string name="pref_snooze_duration_default">10</string>
+
 </resources>

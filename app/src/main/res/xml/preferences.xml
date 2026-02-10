@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="@string/pref_category_notifications">
+
+        <Preference
+            android:key="pref_notification_ringtone"
+            android:title="@string/pref_ringtone_title"
+            android:summary="@string/pref_ringtone_summary_silent" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_notification_vibration"
+            android:title="@string/pref_vibration_title"
+            android:summaryOn="@string/pref_vibration_summary_on"
+            android:summaryOff="@string/pref_vibration_summary_off"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="pref_snooze_duration"
+            android:title="@string/pref_snooze_duration_title"
+            android:entries="@array/pref_snooze_duration_entries"
+            android:entryValues="@array/pref_snooze_duration_values"
+            android:defaultValue="@string/pref_snooze_duration_default" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

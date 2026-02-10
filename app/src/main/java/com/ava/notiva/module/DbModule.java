@@ -37,7 +37,7 @@ public class DbModule {
   @Singleton
   public RemindersDb getRemindersDb(@ApplicationContext Context context) {
     return Room.databaseBuilder(context, RemindersDb.class, "Reminders-DB")
-        .addMigrations(RemindersDb.MIGRATION_1_2)
+        .addMigrations(RemindersDb.MIGRATION_1_2, RemindersDb.MIGRATION_2_3)
         .build();
   }
 

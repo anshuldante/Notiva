@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -27,6 +27,13 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+        <activity
+            android:name="com.ava.notiva.SettingsActivity"
+            android:parentActivityName="com.ava.notiva.MainActivity">
+            <meta-data
+                android:name="androidx.core.app.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name="com.ava.notiva.UpsertReminderActivity"
             android:parentActivityName="com.ava.notiva.MainActivity">
@@ -51,7 +58,11 @@
         <service
             android:name="com.ava.notiva.service.NotificationStarterService"
             android:enabled="true"
-            android:foregroundServiceType="mediaPlayback" />
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps service alive for reliable reminder notification delivery and burst window tracking" />
+        </service>
 
         <receiver
             android:name="com.ava.notiva.service.BootReceiver"

@@ -10,7 +10,7 @@ import com.ava.notiva.model.ReminderModel;
 
 @Database(
     entities = {ReminderModel.class},
-    version = 2,
+    version = 3,
     exportSchema = false)
 public abstract class RemindersDb extends RoomDatabase {
   public abstract ReminderDao reminderDao();
@@ -20,6 +20,16 @@ public abstract class RemindersDb extends RoomDatabase {
     @Override
     public void migrate(@NonNull SupportSQLiteDatabase database) {
       database.execSQL("ALTER TABLE reminders ADD COLUMN snoozed_until INTEGER");
+    }
+  };
+
+  // Migration from version 2 to 3: Add tracking columns for missed reminders and ringtone
+  public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+    @Override
+    public void migrate(@NonNull SupportSQLiteDatabase database) {
+      database.execSQL("ALTER TABLE reminders ADD COLUMN last_fired_at INTEGER");
+      database.execSQL("ALTER TABLE reminders ADD COLUMN last_acknowledged_at INTEGER");
+      database.execSQL("ALTER TABLE reminders ADD COLUMN ringtone_uri TEXT");
     }
   };
 }

@@ -1,10 +1,13 @@
 package com.ava.notiva.service;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static com.ava.notiva.util.ReminderConstants.ACTION_SNOOZE;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_ID;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_NAME;
+import static com.ava.notiva.util.ReminderConstants.SCHEDULED_FIRE_EPOCH;
 
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -13,7 +16,12 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationManagerCompat;
+
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.NotificationGroupManager;
+import com.ava.notiva.util.NotificationPreferences;
+import com.ava.notiva.util.PendingIntentRequestCodes;
 
 import javax.inject.Inject;
 
@@ -38,14 +46,44 @@ public class NotificationStopperService extends Service {
     Log.i(TAG, "NotificationStopperService starting up");
     String action = intent != null ? intent.getAction() : null;
     Log.i(TAG, "Action received: " + action);
-    Intent intentService = new Intent(getApplicationContext(), NotificationStarterService.class);
-    getApplicationContext().stopService(intentService);
+
+    // Extract bit-packed notification ID (for cancellation) and reminder ID (for DB operations)
+    int notificationId = intent != null ? intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1) : -1;
+    int reminderId = intent != null ? intent.getIntExtra(REMINDER_ID, -1) : -1;
+    Log.i(TAG, "reminderId=" + reminderId + ", notificationId=" + notificationId);
+
+    // Cancel the specific notification using its bit-packed ID
+    if (notificationId != -1) {
+      NotificationManagerCompat.from(this).cancel(notificationId);
+      Log.i(TAG, "Cancelled notification ID " + notificationId + " for reminder " + reminderId);
+    }
+
+    // Update last_acknowledged_at using the original reminder ID
+    if (reminderId != -1) {
+      new Thread(() -> {
+        try {
+          reminderDao.updateLastAcknowledgedAt(reminderId, System.currentTimeMillis());
+          Log.i(TAG, "Updated last_acknowledged_at for reminder " + reminderId);
+        } catch (Exception e) {
+          Log.e(TAG, "Failed to update last_acknowledged_at for reminder " + reminderId, e);
+        }
+      }).start();
+    }
+
+    // Update summary and apply collapse logic after cancellation
+    NotificationManager platformManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationGroupManager.updateSummaryAndCollapse(this, platformManager);
 
     if (ACTION_SNOOZE.equals(action)) {
       scheduleSnoozeAlarm(intent);
-      Toast.makeText(getApplicationContext(), "Reminder snoozed for 10 minutes", Toast.LENGTH_SHORT).show();
+      int snoozeDuration = NotificationPreferences.getSnoozeDurationMinutes(this);
+      Toast.makeText(getApplicationContext(),
+          "Reminder snoozed for " + snoozeDuration + " minutes",
+          Toast.LENGTH_SHORT).show();
     }
-    return super.onStartCommand(intent, flags, startId);
+
+    stopSelf();
+    return START_NOT_STICKY;
   }
 
   private void scheduleSnoozeAlarm(Intent intent) {
@@ -57,8 +95,9 @@ public class NotificationStopperService extends Service {
       return;
     }
 
-    // Schedule alarm for 10 minutes from now
-    long snoozeDelayMillis = 10 * 60 * 1000L;
+    // Schedule alarm using preference-driven snooze duration
+    int snoozeDurationMinutes = NotificationPreferences.getSnoozeDurationMinutes(this);
+    long snoozeDelayMillis = snoozeDurationMinutes * 60 * 1000L;
     long snoozeTime = System.currentTimeMillis() + snoozeDelayMillis;
 
     // Mark reminder as snoozed in database so regular scheduling skips it
@@ -75,13 +114,13 @@ public class NotificationStopperService extends Service {
     Intent alarmIntent = new Intent(this, NotificationStarterService.class);
     alarmIntent.putExtra(REMINDER_ID, reminderId);
     alarmIntent.putExtra(REMINDER_NAME, reminderName);
+    alarmIntent.putExtra(SCHEDULED_FIRE_EPOCH, snoozeTime);
 
-    // Use unique request code (reminderId + 2000000) to avoid conflicts with dismiss/snooze PendingIntents
-    PendingIntent pendingIntent = PendingIntent.getService(
-        this, reminderId + 2000000, alarmIntent,
+    PendingIntent pendingIntent = PendingIntent.getForegroundService(
+        this, PendingIntentRequestCodes.forSnoozeAlarm(reminderId), alarmIntent,
         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent);
-    Log.i(TAG, "Snoozed reminder " + reminderId + " for 10 minutes");
+    Log.i(TAG, "Snoozed reminder " + reminderId + " for " + snoozeDurationMinutes + " minutes");
   }
 }
