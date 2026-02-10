@@ -2,6 +2,7 @@ package com.ava.notiva.service;
 
 import static com.ava.notiva.util.ReminderConstants.REMINDER_ID;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_NAME;
+import static com.ava.notiva.util.ReminderConstants.SCHEDULED_FIRE_EPOCH;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -94,6 +95,7 @@ public class ReminderTriggerWorker extends Worker {
           Intent alarmIntent = new Intent(appContext, NotificationStarterService.class);
           alarmIntent.putExtra(REMINDER_ID, reminder.getId());
           alarmIntent.putExtra(REMINDER_NAME, reminder.getName());
+          alarmIntent.putExtra(SCHEDULED_FIRE_EPOCH, next.getTimeInMillis());
           PendingIntent pendingIntent = PendingIntent.getForegroundService(
               appContext,
               PendingIntentRequestCodes.forAlarm(reminder.getId()),
@@ -168,6 +170,7 @@ public class ReminderTriggerWorker extends Worker {
     Intent serviceIntent = new Intent(context, NotificationStarterService.class);
     serviceIntent.putExtra(REMINDER_ID, reminder.getId());
     serviceIntent.putExtra(REMINDER_NAME, reminder.getName());
+    serviceIntent.putExtra(SCHEDULED_FIRE_EPOCH, System.currentTimeMillis());
     ContextCompat.startForegroundService(context, serviceIntent);
   }
 }

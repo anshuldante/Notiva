@@ -2,6 +2,7 @@ package com.ava.notiva.service;
 
 import static com.ava.notiva.util.ReminderConstants.REMINDER_ID;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_NAME;
+import static com.ava.notiva.util.ReminderConstants.SCHEDULED_FIRE_EPOCH;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -144,6 +145,7 @@ public class BootReceiver extends BroadcastReceiver {
     Intent serviceIntent = new Intent(context, NotificationStarterService.class);
     serviceIntent.putExtra(REMINDER_ID, reminder.getId());
     serviceIntent.putExtra(REMINDER_NAME, reminder.getName());
+    serviceIntent.putExtra(SCHEDULED_FIRE_EPOCH, System.currentTimeMillis());
     ContextCompat.startForegroundService(context, serviceIntent);
   }
 
@@ -156,6 +158,7 @@ public class BootReceiver extends BroadcastReceiver {
     Intent alarmIntent = new Intent(context, NotificationStarterService.class);
     alarmIntent.putExtra(REMINDER_ID, reminder.getId());
     alarmIntent.putExtra(REMINDER_NAME, reminder.getName());
+    alarmIntent.putExtra(SCHEDULED_FIRE_EPOCH, alarmTime.getTimeInMillis());
     PendingIntent pendingIntent = PendingIntent.getForegroundService(
         context,
         PendingIntentRequestCodes.forAlarm(reminder.getId()),
