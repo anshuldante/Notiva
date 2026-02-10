@@ -1,10 +1,13 @@
 package com.ava.notiva.service;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static com.ava.notiva.util.ReminderConstants.ACTION_SNOOZE;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_ID;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_NAME;
+import static com.ava.notiva.util.ReminderConstants.SCHEDULED_FIRE_EPOCH;
 
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.NotificationGroupManager;
 import com.ava.notiva.util.NotificationPreferences;
 import com.ava.notiva.util.PendingIntentRequestCodes;
 
@@ -43,12 +47,19 @@ public class NotificationStopperService extends Service {
     String action = intent != null ? intent.getAction() : null;
     Log.i(TAG, "Action received: " + action);
 
-    // Cancel only this reminder's notification, not the entire foreground service
+    // Extract bit-packed notification ID (for cancellation) and reminder ID (for DB operations)
+    int notificationId = intent != null ? intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1) : -1;
     int reminderId = intent != null ? intent.getIntExtra(REMINDER_ID, -1) : -1;
-    if (reminderId != -1) {
-      NotificationManagerCompat.from(this).cancel(reminderId);
-      Log.i(TAG, "Cancelled notification for reminder " + reminderId);
+    Log.i(TAG, "reminderId=" + reminderId + ", notificationId=" + notificationId);
 
+    // Cancel the specific notification using its bit-packed ID
+    if (notificationId != -1) {
+      NotificationManagerCompat.from(this).cancel(notificationId);
+      Log.i(TAG, "Cancelled notification ID " + notificationId + " for reminder " + reminderId);
+    }
+
+    // Update last_acknowledged_at using the original reminder ID
+    if (reminderId != -1) {
       new Thread(() -> {
         try {
           reminderDao.updateLastAcknowledgedAt(reminderId, System.currentTimeMillis());
@@ -58,6 +69,10 @@ public class NotificationStopperService extends Service {
         }
       }).start();
     }
+
+    // Update summary and apply collapse logic after cancellation
+    NotificationManager platformManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationGroupManager.updateSummaryAndCollapse(this, platformManager);
 
     if (ACTION_SNOOZE.equals(action)) {
       scheduleSnoozeAlarm(intent);
@@ -99,8 +114,9 @@ public class NotificationStopperService extends Service {
     Intent alarmIntent = new Intent(this, NotificationStarterService.class);
     alarmIntent.putExtra(REMINDER_ID, reminderId);
     alarmIntent.putExtra(REMINDER_NAME, reminderName);
+    alarmIntent.putExtra(SCHEDULED_FIRE_EPOCH, snoozeTime);
 
-    PendingIntent pendingIntent = PendingIntent.getService(
+    PendingIntent pendingIntent = PendingIntent.getForegroundService(
         this, PendingIntentRequestCodes.forSnoozeAlarm(reminderId), alarmIntent,
         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
