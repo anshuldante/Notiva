@@ -11,7 +11,7 @@ import com.ava.notiva.model.ReminderModel;
 @Database(
     entities = {ReminderModel.class},
     version = 3,
-    exportSchema = false)
+    exportSchema = true)
 public abstract class RemindersDb extends RoomDatabase {
   public abstract ReminderDao reminderDao();
 

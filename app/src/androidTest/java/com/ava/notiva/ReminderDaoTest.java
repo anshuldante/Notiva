@@ -422,6 +422,108 @@ public class ReminderDaoTest {
         assertEquals(Integer.MAX_VALUE, result.getRecurrenceDelay());
     }
 
+    // ==================== Tracking Field Tests (Phase 11) ====================
+
+    @Test
+    public void updateLastFiredAt_setsTimestamp() throws InterruptedException {
+        ReminderModel reminder = createTestReminder("Fire Test");
+        long id = reminderDao.add(reminder);
+
+        long timestamp = System.currentTimeMillis();
+        reminderDao.updateLastFiredAt((int) id, timestamp);
+
+        LiveData<ReminderModel> liveData = reminderDao.get((int) id);
+        ReminderModel result = getLiveDataValue(liveData);
+
+        assertNotNull(result);
+        assertEquals(Long.valueOf(timestamp), result.getLastFiredAt());
+    }
+
+    @Test
+    public void updateLastFiredAt_withNull_clearsTimestamp() throws InterruptedException {
+        ReminderModel reminder = createTestReminder("Fire Clear Test");
+        long id = reminderDao.add(reminder);
+
+        reminderDao.updateLastFiredAt((int) id, System.currentTimeMillis());
+        reminderDao.updateLastFiredAt((int) id, null);
+
+        LiveData<ReminderModel> liveData = reminderDao.get((int) id);
+        ReminderModel result = getLiveDataValue(liveData);
+
+        assertNotNull(result);
+        assertNull("lastFiredAt should be cleared", result.getLastFiredAt());
+    }
+
+    @Test
+    public void updateLastAcknowledgedAt_setsTimestamp() throws InterruptedException {
+        ReminderModel reminder = createTestReminder("Ack Test");
+        long id = reminderDao.add(reminder);
+
+        long timestamp = System.currentTimeMillis();
+        reminderDao.updateLastAcknowledgedAt((int) id, timestamp);
+
+        LiveData<ReminderModel> liveData = reminderDao.get((int) id);
+        ReminderModel result = getLiveDataValue(liveData);
+
+        assertNotNull(result);
+        assertEquals(Long.valueOf(timestamp), result.getLastAcknowledgedAt());
+    }
+
+    @Test
+    public void updateLastAcknowledgedAt_withNull_clearsTimestamp() throws InterruptedException {
+        ReminderModel reminder = createTestReminder("Ack Clear Test");
+        long id = reminderDao.add(reminder);
+
+        reminderDao.updateLastAcknowledgedAt((int) id, System.currentTimeMillis());
+        reminderDao.updateLastAcknowledgedAt((int) id, null);
+
+        LiveData<ReminderModel> liveData = reminderDao.get((int) id);
+        ReminderModel result = getLiveDataValue(liveData);
+
+        assertNotNull(result);
+        assertNull("lastAcknowledgedAt should be cleared", result.getLastAcknowledgedAt());
+    }
+
+    @Test
+    public void add_preservesNewTrackingFields() throws InterruptedException {
+        ReminderModel reminder = createTestReminder("Tracking Fields");
+        reminder.setLastFiredAt(111111L);
+        reminder.setLastAcknowledgedAt(222222L);
+        reminder.setRingtoneUri("content://media/audio/ringtone/42");
+
+        long id = reminderDao.add(reminder);
+
+        LiveData<ReminderModel> liveData = reminderDao.get((int) id);
+        ReminderModel result = getLiveDataValue(liveData);
+
+        assertNotNull(result);
+        assertEquals(Long.valueOf(111111L), result.getLastFiredAt());
+        assertEquals(Long.valueOf(222222L), result.getLastAcknowledgedAt());
+        assertEquals("content://media/audio/ringtone/42", result.getRingtoneUri());
+    }
+
+    @Test
+    public void updateLastFiredAt_doesNotAffectLastAcknowledgedAt() throws InterruptedException {
+        ReminderModel reminder = createTestReminder("Independence Test");
+        long id = reminderDao.add(reminder);
+
+        long firedTimestamp = 100000L;
+        long ackTimestamp = 200000L;
+        reminderDao.updateLastAcknowledgedAt((int) id, ackTimestamp);
+        reminderDao.updateLastFiredAt((int) id, firedTimestamp);
+
+        LiveData<ReminderModel> liveData = reminderDao.get((int) id);
+        ReminderModel result = getLiveDataValue(liveData);
+
+        assertNotNull(result);
+        assertEquals("lastFiredAt should be set independently",
+                Long.valueOf(firedTimestamp), result.getLastFiredAt());
+        assertEquals("lastAcknowledgedAt should be unaffected",
+                Long.valueOf(ackTimestamp), result.getLastAcknowledgedAt());
+    }
+
+    // ==================== Edge Case Tests (continued) ====================
+
     @Test
     public void update_nonExistingReminder_doesNotThrow() {
         ReminderModel reminder = createTestReminder("Ghost");

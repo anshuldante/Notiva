@@ -419,6 +419,93 @@ public class ReminderModelTest {
         assertTrue("Should contain recurrenceType", result.contains("recurrenceType=DAY"));
     }
 
+    // ==================== New Tracking Fields (Phase 11) ====================
+
+    @Test
+    public void equals_differentLastFiredAt_returnsFalse() {
+        ReminderModel model1 = new ReminderModel("Test");
+        model1.setLastFiredAt(1000L);
+
+        ReminderModel model2 = new ReminderModel("Test");
+        model2.setLastFiredAt(2000L);
+
+        assertNotEquals(model1, model2);
+    }
+
+    @Test
+    public void equals_differentLastAcknowledgedAt_returnsFalse() {
+        ReminderModel model1 = new ReminderModel("Test");
+        model1.setLastAcknowledgedAt(1000L);
+
+        ReminderModel model2 = new ReminderModel("Test");
+        model2.setLastAcknowledgedAt(2000L);
+
+        assertNotEquals(model1, model2);
+    }
+
+    @Test
+    public void equals_differentRingtoneUri_returnsFalse() {
+        ReminderModel model1 = new ReminderModel("Test");
+        model1.setRingtoneUri("content://settings/system/alarm_alert");
+
+        ReminderModel model2 = new ReminderModel("Test");
+        model2.setRingtoneUri("content://settings/system/notification_sound");
+
+        assertNotEquals(model1, model2);
+    }
+
+    @Test
+    public void equals_sameNewFields_returnsTrue() {
+        Calendar startTime = Calendar.getInstance();
+
+        ReminderModel model1 = new ReminderModel();
+        model1.setId(1);
+        model1.setName("Test");
+        model1.setActive(true);
+        model1.setStartDateTime(startTime);
+        model1.setRecurrenceType(RecurrenceType.DAY);
+        model1.setRecurrenceDelay(1);
+        model1.setLastFiredAt(5000L);
+        model1.setLastAcknowledgedAt(6000L);
+        model1.setRingtoneUri("content://media/ringtone");
+
+        ReminderModel model2 = new ReminderModel();
+        model2.setId(1);
+        model2.setName("Test");
+        model2.setActive(true);
+        model2.setStartDateTime(startTime);
+        model2.setRecurrenceType(RecurrenceType.DAY);
+        model2.setRecurrenceDelay(1);
+        model2.setLastFiredAt(5000L);
+        model2.setLastAcknowledgedAt(6000L);
+        model2.setRingtoneUri("content://media/ringtone");
+
+        assertEquals(model1, model2);
+        assertEquals(model1.hashCode(), model2.hashCode());
+    }
+
+    @Test
+    public void toString_containsNewFields() {
+        reminder.setLastFiredAt(123456L);
+        reminder.setLastAcknowledgedAt(789012L);
+        reminder.setRingtoneUri("content://media/ringtone");
+
+        String result = reminder.toString();
+
+        assertTrue("Should contain lastFiredAt", result.contains("lastFiredAt=123456"));
+        assertTrue("Should contain lastAcknowledgedAt", result.contains("lastAcknowledgedAt=789012"));
+        assertTrue("Should contain ringtoneUri", result.contains("ringtoneUri='content://media/ringtone'"));
+    }
+
+    @Test
+    public void defaultConstructor_newFieldsAreNull() {
+        ReminderModel model = new ReminderModel();
+
+        assertNull("lastFiredAt should default to null", model.getLastFiredAt());
+        assertNull("lastAcknowledgedAt should default to null", model.getLastAcknowledgedAt());
+        assertNull("ringtoneUri should default to null", model.getRingtoneUri());
+    }
+
     // ==================== Edge Cases ====================
 
     @Test

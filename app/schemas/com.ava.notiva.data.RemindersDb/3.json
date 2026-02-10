@@ -1,0 +1,83 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "9557480b5bccb21257c7c9c1b5e141e5",
+    "entities": [
+      {
+        "tableName": "reminders",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `active` INTEGER NOT NULL, `name` TEXT, `start_date` INTEGER, `recurrence_delay` INTEGER NOT NULL, `recurrence_type` TEXT, `end_date` INTEGER, `snoozed_until` INTEGER, `last_fired_at` INTEGER, `last_acknowledged_at` INTEGER, `ringtone_uri` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "startDateTime",
+            "columnName": "start_date",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "recurrenceDelay",
+            "columnName": "recurrence_delay",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrenceType",
+            "columnName": "recurrence_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "endDateTime",
+            "columnName": "end_date",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "snoozedUntil",
+            "columnName": "snoozed_until",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastFiredAt",
+            "columnName": "last_fired_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastAcknowledgedAt",
+            "columnName": "last_acknowledged_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ringtoneUri",
+            "columnName": "ringtone_uri",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9557480b5bccb21257c7c9c1b5e141e5')"
+    ]
+  }
+}
