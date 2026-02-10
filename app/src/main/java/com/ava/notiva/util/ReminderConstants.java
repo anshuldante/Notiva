@@ -10,6 +10,8 @@ public class ReminderConstants {
   public static final String CHANNEL_NAME = "com.ava.notiva";
   public static final String CHANNEL_DESCRIPTION =
       "This channel is used by Notiva for displaying Alarms";
+  public static final String FOREGROUND_CHANNEL_ID = "NOTIVA_FOREGROUND_CHANNEL";
+  public static final String FOREGROUND_CHANNEL_NAME = "Notiva Service";
   public static final String REMINDER_ID = "com.ava.notiva.REMINDER_ID";
   public static final String REMINDER_ACTIVE = "com.ava.notiva.REMINDER_ACTIVE";
   public static final String REMINDER_NAME = "com.ava.notiva.REMINDER_NAME";
