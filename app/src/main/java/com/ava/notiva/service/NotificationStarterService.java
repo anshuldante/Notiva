@@ -5,9 +5,10 @@ import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static com.ava.notiva.util.ReminderConstants.ACTION_DISMISS;
 import static com.ava.notiva.util.ReminderConstants.ACTION_SNOOZE;
-import static com.ava.notiva.util.ReminderConstants.CHANNEL_DESCRIPTION;
 import static com.ava.notiva.util.ReminderConstants.CHANNEL_ID;
 import static com.ava.notiva.util.ReminderConstants.CHANNEL_NAME;
+import static com.ava.notiva.util.ReminderConstants.FOREGROUND_CHANNEL_ID;
+import static com.ava.notiva.util.ReminderConstants.FOREGROUND_CHANNEL_NAME;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_ID;
 import static com.ava.notiva.util.ReminderConstants.REMINDER_NAME;
 
@@ -19,13 +20,10 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
-import android.os.VibratorManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -35,6 +33,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.ava.notiva.R;
 import com.ava.notiva.data.ReminderDao;
+import com.ava.notiva.util.NotificationPreferences;
 import com.ava.notiva.util.PendingIntentRequestCodes;
 
 import java.util.Date;
@@ -48,15 +47,32 @@ public class NotificationStarterService extends Service {
 
   public static final String TAG = "Notiva.NotificationStarterService";
 
+  /** Notification ID for the persistent foreground service notification. */
+  private static final int FOREGROUND_NOTIFICATION_ID = Integer.MAX_VALUE;
+
+  /** Channel ID suffix for burst (silent) alarm notifications. */
+  private static final String BURST_CHANNEL_SUFFIX = "_burst";
+
+  /** Self-stop timeout: 5 minutes after the last reminder fires. */
+  private static final long SELF_STOP_TIMEOUT_MILLIS = 5 * 60 * 1000L;
+
   @Inject
   ReminderDao reminderDao;
 
-  private MediaPlayer mediaPlayer;
-  private Vibrator vibrator;
-  private int notificationId;
-  private String notificationName;
   private NotificationManagerCompat notificationManager;
-  private boolean mediaPlayerReleased = false;
+
+  /** Tracks when the last notification sound was played for burst window logic. */
+  private long lastSoundPlayedAt = 0;
+
+  /** Handler for the 5-minute self-stop timeout. */
+  private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+
+  /** Runnable that stops the service after timeout. */
+  private final Runnable selfStopRunnable = () -> {
+    Log.i(TAG, "Self-stop timeout reached (5 min), stopping service");
+    stopForeground(STOP_FOREGROUND_REMOVE);
+    stopSelf();
+  };
 
   @Override
   public void onCreate() {
@@ -64,16 +80,10 @@ public class NotificationStarterService extends Service {
     Log.i(TAG, "Inside onCreate");
 
     notificationManager = NotificationManagerCompat.from(this);
-    vibrator = ((VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator();
 
-    mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
-    mediaPlayer.setLooping(true);
-    mediaPlayer.setOnCompletionListener(mp -> safelyStopAndReleaseMediaPlayer());
-    mediaPlayer.setOnErrorListener((mp, what, extra) -> {
-      Log.e(TAG, "MediaPlayer error: what=" + what + ", extra=" + extra);
-      safelyStopAndReleaseMediaPlayer();
-      return true;
-    });
+    createForegroundChannel();
+    Notification persistentNotification = buildForegroundNotification();
+    startForeground(FOREGROUND_NOTIFICATION_ID, persistentNotification);
   }
 
   @Override
@@ -85,12 +95,12 @@ public class NotificationStarterService extends Service {
       return START_NOT_STICKY;
     }
 
-    notificationId = intent.getIntExtra(REMINDER_ID, -1);
-    notificationName = intent.getStringExtra(REMINDER_NAME);
+    int notificationId = intent.getIntExtra(REMINDER_ID, -1);
+    String notificationName = intent.getStringExtra(REMINDER_NAME);
     Log.i(TAG, "Inside onStartCommand, creating a notification for ID: " + notificationId);
     Log.i(TAG, "Starting alarm at: " + new Date());
 
-    // Clear snooze state since the alarm is now firing
+    // Clear snooze state and update last_fired_at
     if (notificationId != -1) {
       new Thread(() -> {
         try {
@@ -104,32 +114,35 @@ public class NotificationStarterService extends Service {
       }).start();
     }
 
-    startForeground(notificationId, buildNotification());
+    // Step 1: Determine if this notification is within a burst window
+    boolean withinBurst = isWithinBurstWindow();
 
-    if (mediaPlayer == null) {
-      Log.i(TAG, "Media Player was null, reinitialising at: " + new Date());
-      mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
-      mediaPlayer.setLooping(true);
-      mediaPlayer.setOnCompletionListener(mp -> safelyStopAndReleaseMediaPlayer());
-      mediaPlayer.setOnErrorListener((mp, what, extra) -> {
-        Log.e(TAG, "MediaPlayer error: what=" + what + ", extra=" + extra);
-        safelyStopAndReleaseMediaPlayer();
-        return true;
-      });
+    // Step 2: Create/recreate the appropriate alarm channel
+    String channelId;
+    if (withinBurst) {
+      channelId = CHANNEL_ID + BURST_CHANNEL_SUFFIX;
+      createAlarmChannel(channelId, false);
+    } else {
+      channelId = CHANNEL_ID;
+      createAlarmChannel(channelId, true);
+      lastSoundPlayedAt = System.currentTimeMillis();
     }
-    mediaPlayer.start();
-    vibrateWithPattern();
+
+    // Step 3: Build and post the reminder notification
+    Notification notification = buildAlarmNotification(channelId, notificationId, notificationName);
+    notificationManager.notify(notificationId, notification);
+
+    // Reset the 5-minute self-stop timer
+    resetSelfStopTimeout();
+
     return START_STICKY;
   }
 
   @Override
   public void onDestroy() {
     super.onDestroy();
-    Log.i(TAG, "Cleaning up the notification");
-
-    safelyStopAndReleaseMediaPlayer();
-    safelyCancelVibration();
-    safeCancelNotification();
+    Log.i(TAG, "Service destroyed, cancelling timeout handler");
+    timeoutHandler.removeCallbacks(selfStopRunnable);
   }
 
   @Nullable
@@ -138,18 +151,96 @@ public class NotificationStarterService extends Service {
     return null;
   }
 
-  private Notification buildNotification() {
-    createNotificationChannel();
-    NotificationCompat.Builder builder = createNotification();
-    attachSnoozeAction(builder);
-    attachDismissActions(builder);
+  // -------------------------------------------------------------------------
+  // Foreground service notification (persistent, low-priority)
+  // -------------------------------------------------------------------------
+
+  private void createForegroundChannel() {
+    NotificationChannel channel = new NotificationChannel(
+        FOREGROUND_CHANNEL_ID,
+        FOREGROUND_CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_LOW);
+    channel.setDescription("Keeps Notiva active for reliable reminder delivery");
+    notificationManager.createNotificationChannel(channel);
+  }
+
+  private Notification buildForegroundNotification() {
+    return new NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_alarm)
+        .setContentTitle("Notiva")
+        .setContentText("Notiva is running")
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setOngoing(true)
+        .build();
+  }
+
+  // -------------------------------------------------------------------------
+  // Alarm notification channels (with-sound and burst/silent variants)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Creates (or recreates) an alarm notification channel.
+   * <p>
+   * Android caches channel settings after first creation. To allow preference
+   * changes to take effect, the channel is deleted and recreated each time.
+   *
+   * @param channelId  the channel ID to create
+   * @param withSound  true for the main channel (plays ringtone), false for burst (silent)
+   */
+  private void createAlarmChannel(String channelId, boolean withSound) {
+    // Delete first to pick up preference changes
+    notificationManager.deleteNotificationChannel(channelId);
+
+    NotificationChannel channel = new NotificationChannel(
+        channelId,
+        CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_HIGH);
+    channel.setDescription("Notiva reminder alerts");
+    channel.setLightColor(Color.BLUE);
+    channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+    if (withSound) {
+      Uri ringtoneUri = NotificationPreferences.getRingtoneUri(this);
+      channel.setSound(ringtoneUri, Notification.AUDIO_ATTRIBUTES_DEFAULT);
+    } else {
+      channel.setSound(null, null);
+    }
+
+    // Vibration is preference-driven on both channel types
+    boolean vibrationEnabled = NotificationPreferences.isVibrationEnabled(this);
+    if (vibrationEnabled) {
+      channel.enableVibration(true);
+      channel.setVibrationPattern(new long[]{0, 500, 300, 500});
+    } else {
+      channel.enableVibration(false);
+    }
+
+    notificationManager.createNotificationChannel(channel);
+  }
+
+  // -------------------------------------------------------------------------
+  // Alarm notification building
+  // -------------------------------------------------------------------------
+
+  private Notification buildAlarmNotification(String channelId, int notificationId, String notificationName) {
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+        .setSmallIcon(R.drawable.ic_alarm)
+        .setContentText(buildReminderText(notificationId, notificationName))
+        .setContentTitle(notificationName)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setCategory(NotificationCompat.CATEGORY_ALARM)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        .setTicker(getText(R.string.ticker_text))
+        .setAutoCancel(true);
+
+    attachSnoozeAction(builder, notificationId, notificationName);
+    attachDismissAction(builder, notificationId, notificationName);
 
     Log.i(TAG, "Notification Built for ID: " + notificationId);
-
     return builder.build();
   }
 
-  private void attachDismissActions(NotificationCompat.Builder builder) {
+  private void attachDismissAction(NotificationCompat.Builder builder, int notificationId, String notificationName) {
     Intent dismissIntent = new Intent(this, NotificationStopperService.class);
     dismissIntent.setAction(ACTION_DISMISS);
     dismissIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
@@ -162,7 +253,7 @@ public class NotificationStarterService extends Service {
     builder.setContentIntent(dismissPendingIntent);
   }
 
-  private void attachSnoozeAction(NotificationCompat.Builder builder) {
+  private void attachSnoozeAction(NotificationCompat.Builder builder, int notificationId, String notificationName) {
     Intent snoozeIntent = new Intent(this, NotificationStopperService.class);
     snoozeIntent.setAction(ACTION_SNOOZE);
     snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
@@ -174,21 +265,8 @@ public class NotificationStarterService extends Service {
         R.drawable.ic_baseline_snooze_24, getString(R.string.snooze), snoozePendingIntent);
   }
 
-  private NotificationCompat.Builder createNotification() {
-    StringBuilder contentTextBuilder = getReminderText();
-    return new NotificationCompat.Builder(this, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_alarm)
-        .setContentText(contentTextBuilder.toString())
-        .setContentTitle(notificationName)
-        .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .setCategory(NotificationCompat.CATEGORY_ALARM)
-        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        .setTicker(getText(R.string.ticker_text))
-        .setAutoCancel(true);
-  }
-
   @NonNull
-  private StringBuilder getReminderText() {
+  private String buildReminderText(int notificationId, String notificationName) {
     StringBuilder contentTextBuilder = new StringBuilder();
     contentTextBuilder.append("Ring Ring...Ring Ring");
     if (notificationId != -1) {
@@ -201,80 +279,33 @@ public class NotificationStarterService extends Service {
     } else {
       Log.i(TAG, "Reminder name was null or empty");
     }
-    return contentTextBuilder;
+    return contentTextBuilder.toString();
   }
 
-  private void createNotificationChannel() {
-    NotificationChannel channel =
-        new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-    channel.setDescription(CHANNEL_DESCRIPTION);
-    channel.setLightColor(Color.BLUE);
-    channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-    notificationManager.createNotificationChannel(channel);
+  // -------------------------------------------------------------------------
+  // Burst window tracking
+  // -------------------------------------------------------------------------
+
+  /**
+   * Returns true if the current time is within the burst window of the last
+   * notification that played sound. Prevents sound cascade when multiple
+   * reminders fire in quick succession.
+   */
+  private boolean isWithinBurstWindow() {
+    return lastSoundPlayedAt > 0
+        && (System.currentTimeMillis() - lastSoundPlayedAt) < NotificationPreferences.getBurstWindowMillis();
   }
 
-  private void vibrateWithPattern() {
-    if (vibrator != null && vibrator.hasVibrator()) {
-      long[] pattern = {0, 500, 300, 500};
-      vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0));  // 0 = repeat from beginning
-    }
-  }
+  // -------------------------------------------------------------------------
+  // Self-stop timeout (5 minutes)
+  // -------------------------------------------------------------------------
 
-  // To be used only when absolutely necessary
-  @SuppressWarnings("unused")
-  private void attachAlarmAutoStopper() {
-    new Handler(Looper.getMainLooper()).postDelayed(() -> {
-      if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-        Log.i(TAG, "Stopping alarm at: " + new Date());
-        mediaPlayer.stop();
-        mediaPlayer.release();
-      }
-    }, 10_000);
-  }
-
-  private void safelyStopAndReleaseMediaPlayer() {
-    if (mediaPlayer == null || mediaPlayerReleased) {
-      return;
-    }
-    Handler mainHandler = new Handler(Looper.getMainLooper());
-    mainHandler.post(() -> {
-      if (mediaPlayer == null || mediaPlayerReleased) {
-        return;
-      }
-      try {
-        Log.i(TAG, "Stopping and releasing MediaPlayer on thread: " + Thread.currentThread().getName());
-        mediaPlayer.setOnCompletionListener(null);
-        mediaPlayer.setOnErrorListener(null);
-        if (mediaPlayer.isPlaying()) {
-          mediaPlayer.stop();
-        }
-        mediaPlayer.release();
-        mediaPlayerReleased = true;
-      } catch (IllegalStateException e) {
-        Log.w(TAG, "MediaPlayer was in illegal state during stop/release", e);
-      } finally {
-        mediaPlayer = null;
-      }
-    });
-  }
-
-  private void safelyCancelVibration() {
-    if (vibrator != null) {
-      try {
-        vibrator.cancel();
-      } catch (Exception e) {
-        Log.w(TAG, "Vibrator cancel failed", e);
-      }
-    }
-  }
-
-  private void safeCancelNotification() {
-    if (notificationManager != null && notificationId != -1) {
-      try {
-        notificationManager.cancel(notificationId);
-      } catch (Exception e) {
-        Log.w(TAG, "NotificationManager cancel failed", e);
-      }
-    }
+  /**
+   * Resets the 5-minute self-stop timer. Called each time a new reminder
+   * fires. If no new reminders fire within 5 minutes, the service stops itself.
+   */
+  private void resetSelfStopTimeout() {
+    timeoutHandler.removeCallbacks(selfStopRunnable);
+    timeoutHandler.postDelayed(selfStopRunnable, SELF_STOP_TIMEOUT_MILLIS);
   }
 }
