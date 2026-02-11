@@ -37,6 +37,9 @@ android {
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
     lint {
         disable 'RemoveWorkManagerInitializer'
     }

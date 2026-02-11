@@ -506,6 +506,89 @@ public class ReminderModelTest {
         assertNull("ringtoneUri should default to null", model.getRingtoneUri());
     }
 
+    // ==================== isSnoozed() ====================
+
+    @Test
+    public void isSnoozed_nullSnoozedUntil_returnsFalse() {
+        reminder.setSnoozedUntil(null);
+        assertFalse("Null snoozedUntil should not be snoozed", reminder.isSnoozed());
+    }
+
+    @Test
+    public void isSnoozed_pastTimestamp_returnsFalse() {
+        reminder.setSnoozedUntil(System.currentTimeMillis() - 60_000L); // 1 minute ago
+        assertFalse("Past snoozedUntil should not be snoozed", reminder.isSnoozed());
+    }
+
+    @Test
+    public void isSnoozed_futureTimestamp_returnsTrue() {
+        reminder.setSnoozedUntil(System.currentTimeMillis() + 600_000L); // 10 minutes from now
+        assertTrue("Future snoozedUntil should be snoozed", reminder.isSnoozed());
+    }
+
+    @Test
+    public void isSnoozed_zeroTimestamp_returnsFalse() {
+        reminder.setSnoozedUntil(0L);
+        assertFalse("Zero snoozedUntil (epoch) should not be snoozed", reminder.isSnoozed());
+    }
+
+    @Test
+    public void isSnoozed_farFutureTimestamp_returnsTrue() {
+        reminder.setSnoozedUntil(Long.MAX_VALUE);
+        assertTrue("Far future snoozedUntil should be snoozed", reminder.isSnoozed());
+    }
+
+    // ==================== snoozedUntil in equals ====================
+
+    @Test
+    public void equals_sameSnoozedUntil_returnsTrue() {
+        ReminderModel model1 = new ReminderModel("Test");
+        model1.setSnoozedUntil(5000L);
+
+        ReminderModel model2 = new ReminderModel("Test");
+        model2.setSnoozedUntil(5000L);
+
+        assertEquals(model1, model2);
+    }
+
+    @Test
+    public void equals_differentSnoozedUntil_returnsFalse() {
+        ReminderModel model1 = new ReminderModel("Test");
+        model1.setSnoozedUntil(5000L);
+
+        ReminderModel model2 = new ReminderModel("Test");
+        model2.setSnoozedUntil(6000L);
+
+        assertNotEquals(model1, model2);
+    }
+
+    @Test
+    public void equals_nullVsNonNullSnoozedUntil_returnsFalse() {
+        ReminderModel model1 = new ReminderModel("Test");
+        model1.setSnoozedUntil(null);
+
+        ReminderModel model2 = new ReminderModel("Test");
+        model2.setSnoozedUntil(5000L);
+
+        assertNotEquals(model1, model2);
+    }
+
+    // ==================== snoozedUntil in toString ====================
+
+    @Test
+    public void toString_containsSnoozedUntil() {
+        reminder.setSnoozedUntil(99999L);
+        String result = reminder.toString();
+        assertTrue("Should contain snoozedUntil", result.contains("snoozedUntil=99999"));
+    }
+
+    @Test
+    public void toString_nullSnoozedUntil_containsNull() {
+        reminder.setSnoozedUntil(null);
+        String result = reminder.toString();
+        assertTrue("Should contain snoozedUntil=null", result.contains("snoozedUntil=null"));
+    }
+
     // ==================== Edge Cases ====================
 
     @Test
